@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" fill="none">
+  <rect width="48" height="48" x="6" y="6" rx="12" fill="#063B4C"/>
+  <path d="M30 18L18 25L30 32L42 25L30 18Z" stroke="#0EA5C6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M22 27.5V36.5C22 38.5 25.5 41 30 41C34.5 41 38 38.5 38 36.5V27.5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M42 25V35" stroke="#0EA5C6" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="66" y="32" font-family="'Tajawal', 'Cairo', sans-serif" font-size="20" font-weight="bold" fill="#063B4C">أكرم إبراهيم</text>
+  <text x="66" y="46" font-family="'Tajawal', 'Cairo', sans-serif" font-size="12" font-weight="500" fill="#0EA5C6">المنصة التعليمية المتطورة</text>
+</svg>
