@@ -44,9 +44,9 @@ export default function LessonPdf({
         className="w-full sm:w-auto"
       >
         <Button variant="secondary" size="sm" className="w-full sm:w-auto gap-2">
-          <Download className="w-4 h-4" />
-          عرض / تحميل الملف
-        </Button>
+        <Download className="w-4 h-4" />
+        عرض / تحميل الملف
+      </Button>
       </a>
     </div>
   );

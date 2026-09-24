@@ -67,7 +67,7 @@ export default function LoginPage() {
             <Input
               label="البريد الالكتروني"
               type="email"
-              placeholder="[EMAIL_ADDRESS]"
+              placeholder="ادخل البريد الالكتروني"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

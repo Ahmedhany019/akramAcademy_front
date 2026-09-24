@@ -95,7 +95,6 @@ const Header = () => {
         {/* Right Actions */}
         <div className="hidden lg:flex items-center gap-3">
 
-          {/* Book Now */}
           <Link
             to="/register"
             className="flex items-center gap-2 rounded-full bg-[#f1c40f] px-6 py-3 text-sm font-bold text-[#0f1d41] transition-all duration-300 hover:scale-105 hover:bg-[#dcb20c]"
@@ -156,7 +155,7 @@ const Header = () => {
 
           <Link
             to="/register"
-            className="flex items-center gap-2 rounded-full bg-[#f1c40f] px-6 py-3 text-sm font-bold text-[#0f1d41] transition-all duration-300 hover:scale-105 hover:bg-[#dcb20c]"
+            className="w-fit mx-auto flex mt-4 items-center gap-2 rounded-full bg-[#f1c40f] px-6 py-3 text-sm font-bold text-[#0f1d41] transition-all duration-300 hover:scale-105 hover:bg-[#dcb20c]"
           >
             سجل دخول
             <ArrowRight size={17} />

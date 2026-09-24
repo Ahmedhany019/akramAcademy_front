@@ -142,12 +142,12 @@ export default function AdminClassesPage() {
       <PageHeader
         title="إدارة الفصول الدراسية"
         subtitle="إضافة وتعديل الصفوف والمراحل التعليمية"
-        action={
-          <Button variant="primary" size="md" onClick={handleOpenAdd} className="gap-2">
-            <Plus className="w-4 h-4" />
-            إضافة فصل
-          </Button>
-        }
+        // action={
+        //   <Button variant="primary" size="md" onClick={handleOpenAdd} className="gap-2">
+        //     <Plus className="w-4 h-4" />
+        //     إضافة فصل
+        //   </Button>
+        // }
       />
 
       {/* Category filter tabs / select */}

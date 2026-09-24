@@ -126,7 +126,7 @@ export default function SubscriptionPlansPage() {
   </p>
 
   <p className="font-bold text-base">
-    01098843280
+    01018049632
   </p>
 
   <p>

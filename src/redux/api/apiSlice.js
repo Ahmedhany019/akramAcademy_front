@@ -95,7 +95,7 @@ export const apiSlice = createApi({
       invalidatesTags: ["Units", "Classes"],
     }),
     updateUnit: builder.mutation({
-      query: ({ id, ...data }) => ({
+      query: ({ id, data }) => ({
         url: `/units/${id}`,
         method: "PUT",
         data,
@@ -186,7 +186,10 @@ export const apiSlice = createApi({
         method: "POST",
         data: formData,
       }),
-      invalidatesTags: (result, error, { lessonId }) => [{ type: "LessonDetails", id: lessonId }, "Lessons"],
+      invalidatesTags: (result, error, { lessonId }) => [
+        { type: "LessonDetails", id: lessonId },
+        "Lessons",
+      ],
     }),
     setLessonVideo: builder.mutation({
       query: ({ lessonId, video_link, status = "active" }) => ({
@@ -194,7 +197,10 @@ export const apiSlice = createApi({
         method: "POST",
         data: { video_link, status },
       }),
-      invalidatesTags: (result, error, { lessonId }) => [{ type: "LessonDetails", id: lessonId }, "Lessons"],
+      invalidatesTags: (result, error, { lessonId }) => [
+        { type: "LessonDetails", id: lessonId },
+        "Lessons",
+      ],
     }),
 
     // PERIODS

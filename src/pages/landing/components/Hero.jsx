@@ -1,5 +1,7 @@
 import React from "react";
 import { hero, teacher, lefrance } from "../../../assets/images";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 const Hero = () => {
   return (
@@ -15,7 +17,8 @@ const Hero = () => {
             className="inset-0 h-full w-full object-cover object-center"
           />
         </div>
-        <div className="flex justify-between items-center w-full h-[50vh] relative">
+        <div className="w-full flex flex-col md:flex-row justify-between items-center">
+        <div className="flex flex-1 justify-between items-center w-full h-[50vh] relative">
           <div className="flex-1 flex justify-center items-center">
             
           </div>
@@ -27,15 +30,27 @@ const Hero = () => {
                   <span className="w-full h-2  bg-white"></span>
                   <span className="w-full h-2 rounded-l-full bg-[#1a45c4]"></span>
               </span>
+              
           </div>
                   <img
                   src={lefrance}
                   alt="lefrance"
-                  className="absolute md:bottom-[-100%] bottom-[-200%] left-0 w-[300px] object-cover object-center"
+                  className="absolute bottom-[-100%] left-0 w-[300px] object-cover object-center"
                   />
             
             <p className="md:text-4xl text-2xl w-full text-end">Professeur de français</p>
+          <Link
+          to="/register"
+          className="flex mr-auto w-fit items-center gap-2 rounded-full bg-[#1a45c4] px-6 py-3 text-lg font-bold text-white transition-all duration-300 hover:scale-105 hover:bg-[#20276d]"
+          >
+          سجل دخول
+          <ArrowRight size={20} className="animate-bounce transition-all duration-500"/>
+        </Link>
           </div>
+          
+        </div>
+
+        
         </div>
       
       {/* <Features /> */}

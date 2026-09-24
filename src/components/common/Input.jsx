@@ -11,6 +11,7 @@ export default function Input({
   required = false,
   className = "",
   disabled = false,
+  defaultValue,
   ...props
 }) {
   return (
@@ -26,6 +27,7 @@ export default function Input({
         onChange={onChange}
         placeholder={placeholder}
         disabled={disabled}
+        defaultValue={defaultValue}
         required={required}
         min={type === "number" && 0}
         className={cn(

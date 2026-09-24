@@ -105,15 +105,17 @@ export default function RegisterPage() {
                 value={parentPhone}
                 onChange={(e) => setParentPhone(e.target.value)}
                 type="number"
+                required
               />
 
             </div>
             <Input
-              label="البريد الإلكتروني (اختياري)"
+              label="البريد الإلكتروني"
               type="email"
               placeholder="example@mail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
 
             <Select
@@ -122,7 +124,7 @@ export default function RegisterPage() {
               value={classId}
               onChange={(e) => setClassId(e.target.value)}
               placeholder="اختر الصف الدراسي"
-              
+              required
             />
 
             <Input

@@ -262,7 +262,7 @@ export default function AdminPeriodsPage() {
             <Input
               label="تاريخ البداية"
               type="date"
-              value={startDate}
+              value={startDate || new Date().toISOString().split("T")[0]}
               onChange={(e) => setStartDate(e.target.value)}
             />
             <Input

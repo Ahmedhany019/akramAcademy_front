@@ -9,7 +9,13 @@ import PageHeader from "../../components/common/PageHeader";
 import Skeleton from "../../components/common/Skeleton";
 import EmptyState from "../../components/common/EmptyState";
 import LessonCard from "../../components/lessons/LessonCard";
-import { Calendar, Layers, ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
+import {
+  Calendar,
+  Layers,
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+} from "lucide-react";
 import { cn } from "../../utils/cn";
 
 export default function ClassContentPage() {
@@ -23,12 +29,11 @@ export default function ClassContentPage() {
 
   const { data: unitsData, isLoading: loadingUnits } = useGetClassUnitsQuery(
     effectiveClassId,
-    { skip: !effectiveClassId }
+    { skip: !effectiveClassId },
   );
-  const { data: periodsData, isLoading: loadingPeriods } = useGetPeriodsQuery(
-    { classId: effectiveClassId },
-    { skip: !effectiveClassId }
-  );
+  const { data: periodsData, isLoading: loadingPeriods } =
+    useGetPeriodsQuery();
+    // { skip: !effectiveClassId }
 
   const units = unitsData?.data.units || unitsData || [];
   const periods = periodsData?.data || periodsData || [];
@@ -43,6 +48,10 @@ export default function ClassContentPage() {
 
   const [selectedPeriodId, setSelectedPeriodId] = useState(null);
 
+  const BASE_URL = import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL.replace("/api/v1", "")
+    : "http://localhost:8000";
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -53,7 +62,8 @@ export default function ClassContentPage() {
         }
         subtitle={
           selectedUnit
-            ? selectedUnit.description || "قائمة الدروس والمحتوى التعليمي التابع لهذه الوحدة"
+            ? selectedUnit.description ||
+              "قائمة الدروس والمحتوى التعليمي التابع لهذه الوحدة"
             : "تصفح الوحدات والدروس المتاحة لهذا الصف الدراسي"
         }
         breadcrumbs={
@@ -105,7 +115,7 @@ export default function ClassContentPage() {
                 "px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors border",
                 selectedPeriodId === null
                   ? "bg-primary text-white border-primary"
-                  : "bg-gray-50 text-textSecondary border-surface-border hover:bg-gray-100"
+                  : "bg-gray-50 text-textSecondary border-surface-border hover:bg-gray-100",
               )}
             >
               الكل
@@ -118,14 +128,14 @@ export default function ClassContentPage() {
                   "px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors border",
                   selectedPeriodId === period.id
                     ? "bg-cyanAccent text-white border-cyanAccent"
-                    : "bg-gray-50 text-textSecondary border-surface-border hover:bg-gray-100"
+                    : "bg-gray-50 text-textSecondary border-surface-border hover:bg-gray-100",
                 )}
               >
                 {period.type === "year"
                   ? "العام الدراسي"
                   : period.type === "term"
-                  ? "الفصل الدراسي"
-                  : "الشهر"}
+                    ? "الفصل الدراسي"
+                    : "الشهر"}
               </button>
             ))}
           </div>
@@ -139,22 +149,67 @@ export default function ClassContentPage() {
       {/* VIEW 1: Lessons inside Selected Unit */}
       {selectedUnit ? (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-primary flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-cyanAccent" />
-              دروس {selectedUnit.name}
-            </h2>
-            <span className="text-xs bg-gray-100 text-textSecondary font-semibold px-3 py-1 rounded-full">
-              {(selectedUnit.lessons || []).length} درس
-            </span>
-          </div>
+          {/* Unit Hero Banner with Creative Thumbnail integration */}
+          {selectedUnit.thumbnail ? (
+            <div className="relative overflow-hidden rounded-3xl bg-primary text-white p-6 sm:p-8 shadow-card border border-primary-dark/30">
+              <div
+                className="absolute inset-0 bg-cover bg-center opacity-20 scale-105 blur-sm"
+                style={{
+                  backgroundImage: `url(${
+                    selectedUnit.thumbnail.startsWith("http")
+                      ? selectedUnit.thumbnail
+                      : `${BASE_URL}${selectedUnit.thumbnail}`
+                  })`,
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-transparent" />
+              <div className="relative z-10 flex flex-col sm:flex-row items-center gap-6 justify-between">
+                <div className="space-y-2 text-right">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-cyanAccent text-xs font-bold border border-white/15">
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>{(selectedUnit.lessons || []).length} درس متاح</span>
+                  </div>
+                  <h2 className="text-2xl font-black">{selectedUnit.name}</h2>
+                  {selectedUnit.description && (
+                    <p className="text-gray-300 text-xs sm:text-sm max-w-xl leading-relaxed">
+                      {selectedUnit.description}
+                    </p>
+                  )}
+                </div>
+                <div className="relative group shrink-0">
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl shadow-black/40 rotate-2 group-hover:rotate-0 transition-transform duration-300 bg-white/10 backdrop-blur-md">
+                    <img
+                      src={
+                        selectedUnit.thumbnail.startsWith("http")
+                          ? selectedUnit.thumbnail
+                          : `${BASE_URL}${selectedUnit.thumbnail}`
+                      }
+                      alt={selectedUnit.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-primary flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-cyanAccent" />
+                دروس {selectedUnit.name}
+              </h2>
+              <span className="text-xs bg-gray-100 text-textSecondary font-semibold px-3 py-1 rounded-full">
+                {(selectedUnit.lessons || []).length} درس
+              </span>
+            </div>
+          )}
 
           {(() => {
             const lessons = selectedUnit.lessons || [];
             const filteredLessons = selectedPeriodId
               ? lessons.filter(
                   (l) =>
-                    String(l.periodId ?? l.period_id) === String(selectedPeriodId)
+                    String(l.periodId ?? l.period_id) ===
+                    String(selectedPeriodId),
                 )
               : lessons;
 
@@ -170,7 +225,7 @@ export default function ClassContentPage() {
                 />
               );
             }
-
+            //console.log(filteredLessons[0].end_date > Date.now()/1000)
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredLessons.map((lesson) => (
@@ -199,54 +254,84 @@ export default function ClassContentPage() {
 
           {loadingUnits ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <Skeleton className="h-36 rounded-2xl" />
-              <Skeleton className="h-36 rounded-2xl" />
-              <Skeleton className="h-36 rounded-2xl" />
+              <Skeleton className="h-44 rounded-3xl" />
+              <Skeleton className="h-44 rounded-3xl" />
+              <Skeleton className="h-44 rounded-3xl" />
             </div>
           ) : units.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {units.map((unit) => {
-                console.log(unit)
+              {units.map((unit, index) => {
                 const lessons = unit.lessons || [];
-                const filteredLessons = selectedPeriodId
-                  ? lessons.filter(
-                      (l) =>
-                        String(l.periodId ?? l.period_id) ===
-                        String(selectedPeriodId)
-                    )
-                  : lessons;
+                const thumbnailUrl = unit.thumbnail
+                  ? unit.thumbnail.startsWith("http")
+                    ? unit.thumbnail
+                    : `${BASE_URL}${unit.thumbnail}`
+                  : null;
 
                 return (
                   <Link
                     key={unit.id}
                     to={`/classes/${effectiveClassId}/units/${unit.id}`}
-                    className="bg-white border border-surface-border hover:border-cyanAccent rounded-2xl p-6 shadow-soft hover:shadow-card transition-all duration-200 flex flex-col justify-between group cursor-pointer"
+                    className="group bg-white border border-surface-border hover:border-cyanAccent/60 rounded-2xl overflow-hidden shadow-soft hover:shadow-xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
                   >
                     <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="p-3 bg-cyan-50 text-cyanAccent rounded-xl group-hover:bg-primary group-hover:text-white transition-colors">
-                          <Layers className="w-6 h-6" />
+                      {/* YouTube-style 16:9 Thumbnail Header */}
+                      <div className="relative w-full aspect-video bg-gradient-to-br from-primary via-slate-900 to-primary-dark overflow-hidden">
+                        {thumbnailUrl ? (
+                          <img
+                            src={thumbnailUrl}
+                            alt={unit.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-white/40">
+                            <Layers className="w-12 h-12 text-cyanAccent/60 group-hover:scale-110 transition-transform duration-300" />
+                            <span className="text-xs font-semibold text-white/60">الوحدة {index + 1}</span>
+                          </div>
+                        )}
+
+                        {/* Top Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 pointer-events-none" />
+
+                        {/* Unit Index Badge (Top Right) */}
+                        <div className="absolute top-3 right-3 z-10">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md text-white text-[11px] font-black border border-white/10 shadow-sm">
+                            الوحدة {index + 1}
+                          </span>
                         </div>
-                        <span className="text-xs bg-gray-100 text-textSecondary font-semibold px-2.5 py-1 rounded-full group-hover:bg-cyan-50 group-hover:text-cyanAccent transition-colors">
-                          {lessons.length} دروس
-                        </span>
+
+                        {/* Lessons Count Pill (Bottom Left YouTube timestamp style) */}
+                        <div className="absolute bottom-3 left-3 z-10">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md text-cyanAccent text-[11px] font-bold border border-cyanAccent/30 shadow-md">
+                            <BookOpen className="w-3.5 h-3.5 text-cyanAccent" />
+                            <span>{lessons.length} دروس</span>
+                          </span>
+                        </div>
                       </div>
 
-                      <h3 className="text-base font-bold text-primary group-hover:text-cyanAccent transition-colors">
-                        {unit.name}
-                      </h3>
+                      {/* Card Body */}
+                      <div className="p-4 sm:p-5">
+                        <h3 className="text-base font-black text-primary group-hover:text-cyanAccent transition-colors line-clamp-1">
+                          {unit.name}
+                        </h3>
 
-                      {unit.description && (
-                        <p className="text-xs text-textSecondary mt-2 line-clamp-2 leading-relaxed">
-                          {unit.description}
-                        </p>
-                      )}
+                        {unit.description ? (
+                          <p className="text-xs text-textSecondary mt-2 line-clamp-2 leading-relaxed">
+                            {unit.description}
+                          </p>
+                        ) : (
+                          <p className="text-xs text-textSecondary/60 mt-2 italic">
+                            انقر لاستكشاف دروس وتمارين هذه الوحدة
+                          </p>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-surface-border flex items-center justify-between text-xs font-bold text-cyanAccent">
-                      <span>عرض الدروس</span>
-                      <div className="p-1 rounded-lg bg-cyan-50 group-hover:translate-x-[-4px] transition-transform">
-                        <ArrowLeft className="w-4 h-4" />
+                    {/* Footer Action */}
+                    <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-surface-border/60 flex items-center justify-between text-xs font-bold text-cyanAccent">
+                      <span className="group-hover:text-primary transition-colors">ابدأ الوحدة</span>
+                      <div className="p-1.5 rounded-xl bg-cyan-50 group-hover:bg-primary group-hover:text-white group-hover:translate-x-[-4px] transition-all duration-300">
+                        <ArrowLeft className="w-3.5 h-3.5" />
                       </div>
                     </div>
                   </Link>

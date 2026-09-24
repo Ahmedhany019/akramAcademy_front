@@ -12,7 +12,7 @@ import Modal from "../../components/common/Modal";
 import Input from "../../components/common/Input";
 import Textarea from "../../components/common/Textarea";
 import Select from "../../components/common/Select";
-import { Plus, Edit2 } from "lucide-react";
+import { Plus, Edit2, Image as ImageIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function AdminUnitsPage() {
@@ -22,7 +22,8 @@ export default function AdminUnitsPage() {
   const classes = classesData?.data || classesData || [];
 
   // Automatically select first class if none selected
-  const activeClassId = selectedClassId || (classes[0]?.id ? String(classes[0].id) : "");
+  const activeClassId =
+    selectedClassId || (classes[0]?.id ? String(classes[0].id) : "");
 
   const { data: unitsData, isLoading } = useGetClassUnitsQuery(activeClassId, {
     skip: !activeClassId,
@@ -38,6 +39,8 @@ export default function AdminUnitsPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [targetClassId, setTargetClassId] = useState(activeClassId);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
   const classOptions = Array.isArray(classes)
@@ -49,6 +52,8 @@ export default function AdminUnitsPage() {
     setName("");
     setDescription("");
     setTargetClassId(activeClassId);
+    setThumbnailFile(null);
+    setThumbnailPreview("");
     setErrorMsg("");
     setIsModalOpen(true);
   };
@@ -57,7 +62,9 @@ export default function AdminUnitsPage() {
     setEditingUnit(unit);
     setName(unit.name || "");
     setDescription(unit.description || "");
-    setTargetClassId(String(unit.classId || activeClassId));
+    setTargetClassId(String(unit.class_id || unit.classId));
+    setThumbnailFile(null);
+    setThumbnailPreview(unit.thumbnail || "");
     setErrorMsg("");
     setIsModalOpen(true);
   };
@@ -71,24 +78,28 @@ export default function AdminUnitsPage() {
     }
 
     try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("class_id", targetClassId);
+      if (description) {
+        formData.append("description", description);
+      }
+      if (thumbnailFile) {
+        formData.append("thumbnail", thumbnailFile);
+      }
+
       if (editingUnit) {
         await updateUnit({
           id: editingUnit.id,
-          name,
-          description,
-          class_id: Number(targetClassId),
+          data: formData,
         }).unwrap();
       } else {
-        await createUnit({
-          name,
-          description,
-          class_id: Number(targetClassId),
-        }).unwrap();
+        await createUnit(formData).unwrap();
       }
       setIsModalOpen(false);
     } catch (err) {
       setErrorMsg(
-        err.data?.message || err.message || "حدث خطأ أثناء حفظ بيانات الوحدة"
+        err.data?.message || err.message || "حدث خطأ أثناء حفظ بيانات الوحدة",
       );
     }
   };
@@ -96,11 +107,34 @@ export default function AdminUnitsPage() {
   const currentClassName =
     classes.find((c) => String(c.id) === String(activeClassId))?.name || "-";
 
+  const BASE_URL = import.meta.env.VITE_API_URL.replace("/api/v1", "");
   const columns = [
+    {
+      header: "صورة الوحدة",
+      accessor: "thumbnail",
+      render: (row) =>
+        row.thumbnail ? (
+          <img
+            src={
+              row.thumbnail.startsWith("http")
+                ? row.thumbnail
+                : `${BASE_URL}${row.thumbnail}`
+            }
+            alt={row.name}
+            className="w-12 h-12 object-cover rounded-xl border border-gray-200 shadow-sm"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-gray-400">
+            <ImageIcon className="w-5 h-5" />
+          </div>
+        ),
+    },
     {
       header: "اسم الوحدة",
       accessor: "name",
-      render: (row) => <span className="font-bold text-primary">{row.name}</span>,
+      render: (row) => (
+        <span className="font-bold text-primary">{row.name}</span>
+      ),
     },
     {
       header: "الفصل",
@@ -127,21 +161,25 @@ export default function AdminUnitsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="إدارة الوحدات الدراسية"
-        subtitle="إدارة وتبويب الوحدات لكل صف دراسي"
+        title="إدارة الأقسام الدراسية"
+        subtitle="إدارة وتبويب الأقسام لكل صف دراسي"
         action={
           <div className="flex items-center gap-2">
-
-          <Button variant="primary" size="md" onClick={handleOpenAdd} className="gap-2">
-            <Plus className="w-4 h-4" />
-            إضافة وحدة
-          </Button>
-          <Link to="/admin/lessons/create">
-            <Button variant="primary" size="md" className="gap-2">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={handleOpenAdd}
+              className="gap-2"
+            >
               <Plus className="w-4 h-4" />
-              إضافة درس جديد
+              إضافة قسم
             </Button>
-          </Link>
+            <Link to="/admin/lessons/create">
+              <Button variant="primary" size="md" className="gap-2">
+                <Plus className="w-4 h-4" />
+                إضافة درس جديد
+              </Button>
+            </Link>
           </div>
         }
       />
@@ -198,6 +236,38 @@ export default function AdminUnitsPage() {
             onChange={(e) => setName(e.target.value)}
             required
           />
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold text-primary">
+              صورة غلاف الوحدة (Thumbnail)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setThumbnailFile(file);
+                  setThumbnailPreview(URL.createObjectURL(file));
+                }
+              }}
+              className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer"
+            />
+            {thumbnailPreview && (
+              <div className="mt-2">
+                <img
+                  src={
+                    thumbnailPreview.startsWith("blob:") ||
+                    thumbnailPreview.startsWith("http")
+                      ? thumbnailPreview
+                      : `http://localhost:8000${thumbnailPreview}`
+                  }
+                  alt="Preview"
+                  className="w-24 h-24 object-cover rounded-xl border border-gray-200 shadow-sm"
+                />
+              </div>
+            )}
+          </div>
 
           <Textarea
             label="وصف الوحدة"

@@ -1,16 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetStudentsQuery } from "../../redux/api/apiSlice";
 import PageHeader from "../../components/common/PageHeader";
 import Table from "../../components/tables/Table";
 import Button from "../../components/common/Button";
 import Badge from "../../components/common/Badge";
-import { Eye } from "lucide-react";
+import Input from "../../components/common/Input";
+import { Eye, Search } from "lucide-react";
 
 export default function AdminStudentsPage() {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const { data: studentsData, isLoading } = useGetStudentsQuery();
   const students = studentsData?.data || studentsData || [];
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  const filteredStudents = students.filter((student) => {
+    const term = debouncedSearchTerm.trim().toLowerCase();
+    if (!term) return true;
+    const nameMatch = student.name?.toLowerCase().includes(term);
+    const phoneMatch = student.phone?.includes(term);
+    const parentPhoneMatch = student.parent_phone?.includes(term);
+    return nameMatch || phoneMatch || parentPhoneMatch;
+  });
 
   const columns = [
     {
@@ -66,11 +88,23 @@ export default function AdminStudentsPage() {
         subtitle="عرض قائمة الطلاب المسجلين بالمنصة وتفاصيل اشتراكاتهم"
       />
 
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-2xl border border-surface-border shadow-soft">
+        <div className="w-full sm:w-80 relative">
+          <Input
+            placeholder="البحث باسم الطالب أو رقم الهاتف..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+      </div>
+
       <Table
         columns={columns}
-        data={students}
+        data={filteredStudents}
         isLoading={isLoading}
-        emptyMessage="لا يوجد طلاب مسجلين حتى الآن"
+        emptyMessage={searchTerm ? "لا توجد نتائج مطابقة للبحث" : "لا يوجد طلاب مسجلين حتى الآن"}
       />
     </div>
   );

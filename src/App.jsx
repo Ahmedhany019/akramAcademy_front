@@ -76,7 +76,7 @@ export default function App() {
           <Route path="students/:id" element={<AdminStudentDetailsPage />} />
           <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
-          <Route path="settings" element={<AdminSettingsPage />} />
+          {/* <Route path="settings" element={<AdminSettingsPage />} /> */}
         </Route>
       </Route>
 

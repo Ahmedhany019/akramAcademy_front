@@ -1,11 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { PlayCircle, Lock, FileText, CheckCircle2, Sparkles } from "lucide-react";
+import {
+  PlayCircle,
+  Lock,
+  FileText,
+  CheckCircle2,
+  Sparkles,
+} from "lucide-react";
 import Badge from "../common/Badge";
 
 export default function LessonCard({ lesson, isLocked = false }) {
   const isFree = Boolean(lesson.is_free);
-
+  //console.log(lesson)
   const cardContent = (
     <div
       className={`p-4 bg-white border rounded-2xl transition-all duration-200 shadow-soft flex items-center justify-between gap-4 ${
@@ -20,8 +26,8 @@ export default function LessonCard({ lesson, isLocked = false }) {
             isLocked
               ? "bg-amber-50 text-amber-600"
               : isFree
-              ? "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white"
-              : "bg-cyan-50 text-cyanAccent group-hover:bg-primary group-hover:text-white"
+                ? "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white"
+                : "bg-cyan-50 text-cyanAccent group-hover:bg-primary group-hover:text-white"
           }`}
         >
           {isLocked ? (
@@ -60,12 +66,18 @@ export default function LessonCard({ lesson, isLocked = false }) {
 
       <div>
         {isFree ? (
-          <Badge variant="success" className="gap-1 bg-emerald-50 text-emerald-600 border border-emerald-200">
+          <Badge
+            variant="success"
+            className="gap-1 bg-emerald-50 text-emerald-600 border border-emerald-200"
+          >
             <Sparkles className="w-3 h-3" />
             مجاني
           </Badge>
         ) : isLocked ? (
-          <Badge variant="warning" className="gap-1 bg-amber-50 text-amber-700 border border-amber-200">
+          <Badge
+            variant="warning"
+            className="gap-1 bg-amber-50 text-amber-700 border border-amber-200"
+          >
             <Lock className="w-3 h-3" />
             محتوى مشتركين
           </Badge>
@@ -83,5 +95,9 @@ export default function LessonCard({ lesson, isLocked = false }) {
     return <div>{cardContent}</div>;
   }
 
-  return <Link to={`/lessons/${lesson.id}`} className="block">{cardContent}</Link>;
+  return (
+    <Link to={`/lessons/${lesson.id}`} className="block">
+      {cardContent}
+    </Link>
+  );
 }

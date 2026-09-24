@@ -26,12 +26,20 @@ export default function LessonViewPage() {
   const lesson = lessonData?.data || lessonData;
   const hasAccess = lesson?.has_access ?? false;
 
-  const { data: pdfData, isLoading: loadingPdf, error: pdfError } = useGetLessonPdfQuery(lessonId, {
+  const {
+    data: pdfData,
+    isLoading: loadingPdf,
+    error: pdfError,
+  } = useGetLessonPdfQuery(lessonId, {
     skip: !lessonId || !hasAccess,
   });
-  console.log(pdfData)
+  //console.log(pdfData)
 
-  const { data: videoData, isLoading: loadingVideo, error: videoError } = useGetLessonVideoQuery(lessonId, {
+  const {
+    data: videoData,
+    isLoading: loadingVideo,
+    error: videoError,
+  } = useGetLessonVideoQuery(lessonId, {
     skip: !lessonId || !hasAccess,
   });
 
@@ -43,7 +51,9 @@ export default function LessonViewPage() {
     lesson?.content?.video_link ||
     lesson?.video_url;
 
-  const apiOrigin = (import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1").replace(/\/api\/v1\/?$/, "");
+  const apiOrigin = (
+    import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1"
+  ).replace(/\/api\/v1\/?$/, "");
 
   const rawPdfUrl =
     pdfData?.data?.url ||
@@ -87,7 +97,10 @@ export default function LessonViewPage() {
           { label: "الرئيسية", href: "/" },
           {
             label: lesson.class?.name || "الصف الدراسي",
-            href: lesson.class?.id || lesson.classId ? `/classes/${lesson.class?.id || lesson.classId}` : "#",
+            href:
+              lesson.class?.id || lesson.classId
+                ? `/classes/${lesson.class?.id || lesson.classId}`
+                : "#",
           },
           { label: lesson.title },
         ]}
@@ -105,14 +118,17 @@ export default function LessonViewPage() {
               هذا الدرس متاح للمشتركين فقط
             </h2>
             <p className="text-sm text-textSecondary leading-relaxed">
-              اشترك في الخطة الدراسية الخاصة بهذا الصف للوصول إلى فيديو الشرح الكامل والمذكرة والمرفقات.
+              اشترك في الخطة الدراسية الخاصة بهذا الصف للوصول إلى فيديو الشرح
+              الكامل والمذكرة والمرفقات.
             </p>
           </div>
 
           {/* Lesson Description Preview if available */}
           {lesson.description && (
             <div className="p-4 bg-gray-50 rounded-2xl border border-surface-border text-right max-w-lg mx-auto">
-              <h4 className="text-xs font-bold text-primary mb-1">عن هذا الدرس:</h4>
+              <h4 className="text-xs font-bold text-primary mb-1">
+                عن هذا الدرس:
+              </h4>
               <p className="text-xs text-textSecondary leading-relaxed">
                 {lesson.description}
               </p>
@@ -121,11 +137,18 @@ export default function LessonViewPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link to="/subscription-plans" className="w-full sm:w-auto">
-              <Button variant="primary" size="lg" className="w-full sm:w-auto gap-2">
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full sm:w-auto gap-2"
+              >
                 اشترك للوصول إلى محتوى الدرس
               </Button>
             </Link>
-            <Link to={lesson.class?.id ? `/classes/${lesson.class.id}` : "/"} className="w-full sm:w-auto">
+            <Link
+              to={lesson.class?.id ? `/classes/${lesson.class.id}` : "/"}
+              className="w-full sm:w-auto"
+            >
               <Button variant="outline" size="lg" className="w-full sm:w-auto">
                 العودة للوحدة
               </Button>
@@ -145,7 +168,9 @@ export default function LessonViewPage() {
             {/* Lesson Description */}
             {lesson.description && (
               <div className="pt-4 border-t border-surface-border text-right">
-                <h3 className="text-sm font-bold text-primary mb-1">وصف الدرس</h3>
+                <h3 className="text-sm font-bold text-primary mb-1">
+                  وصف الدرس
+                </h3>
                 <p className="text-xs text-textSecondary leading-relaxed">
                   {lesson.description}
                 </p>
@@ -156,7 +181,9 @@ export default function LessonViewPage() {
           {/* PDF Resource Component */}
           <LessonPdf
             pdfUrl={pdfUrl}
-            title={lesson.title ? `مذكرة: ${lesson.title}` : "المذكرة والمرفقات"}
+            title={
+              lesson.title ? `مذكرة: ${lesson.title}` : "المذكرة والمرفقات"
+            }
             isLoading={loadingPdf}
           />
         </>

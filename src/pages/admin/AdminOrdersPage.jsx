@@ -68,7 +68,7 @@ const filteredOrders = statusFilter
 
   const columns = [
     {
-      header: "رقم الطلب",
+      header: "معرف الطلب",
       accessor: "id",
       render: (row) => (
         <span className="font-mono font-bold text-primary">#{row.id}</span>
@@ -84,6 +84,17 @@ const filteredOrders = statusFilter
         >
           {row.user?.name || row.studentName || row.student_name || "-"}
         </Link>
+      ),
+    },
+    {
+      header: "هاتف الطالب",
+      accessor: "student",
+      render: (row) => (
+        <span
+          className="font-bold text-primary"
+        >
+          {row.student_phone || "-"}
+        </span>
       ),
     },
     {

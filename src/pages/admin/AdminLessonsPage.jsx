@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   useGetLessonsQuery,
   useGetClassesQuery,
+  useGetMeQuery,
   useDeleteLessonMutation,
   usePublishLessonMutation,
   useUnpublishLessonMutation,
@@ -18,6 +19,7 @@ import { formatDate } from "../../utils/cn";
 
 export default function AdminLessonsPage() {
   const navigate = useNavigate();
+  const { data: meData } = useGetMeQuery();
   const { data: lessonsData, isLoading } = useGetLessonsQuery();
   const { data: classesData } = useGetClassesQuery();
   const [deleteLesson, { isLoading: isDeleting }] = useDeleteLessonMutation();
@@ -30,6 +32,7 @@ export default function AdminLessonsPage() {
 
   const lessons = lessonsData?.data || lessonsData || [];
   const classes = classesData?.data || classesData || [];
+  const user = meData?.data?.user || meData?.user;
 
   const classOptions = Array.isArray(classes)
     ? classes.map((c) => ({ value: String(c.id), label: c.name }))
@@ -50,10 +53,23 @@ export default function AdminLessonsPage() {
     { value: "12", label: "ديسمبر (12)" },
   ];
 
-  const yearOptions = [
-    { value: "2026", label: "2026" },
-    { value: "2027", label: "2027" },
-  ];
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    let startYear = currentYear;
+
+    if (user?.created_at) {
+      const createdYear = new Date(user.created_at).getFullYear();
+      if (!isNaN(createdYear)) {
+        startYear = createdYear;
+      }
+    }
+
+    const options = [];
+    for (let yr = startYear; yr <= currentYear; yr++) {
+      options.push({ value: String(yr), label: String(yr) });
+    }
+    return options;
+  }, [user?.created_at]);
 
   const filteredLessons = lessons.filter((lesson) => {
     if (selectedClassId) {

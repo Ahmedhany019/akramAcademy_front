@@ -42,20 +42,20 @@ export default function AdminSidebar({ onItemClick }) {
   const navLinks = [
     { to: "/admin", label: "الرئيسية", icon: LayoutDashboard, end: true },
     { to: "/admin/classes", label: "إدارة الفصول", icon: FolderKanban },
-    { to: "/admin/units", label: "الوحدات", icon: Layers },
+    { to: "/admin/units", label: "الأقسام", icon: Layers },
     { to: "/admin/lessons", label: "الدروس", icon: BookOpen },
     { to: "/admin/periods", label: "الفترات الدراسية", icon: Calendar },
     { to: "/admin/subscription-plans", label: "خطط الاشتراك", icon: CreditCard },
     { to: "/admin/students", label: "الطلاب", icon: Users },
     { to: "/admin/subscriptions", label: "الاشتراكات", icon: CheckSquare },
     { to: "/admin/orders", label: "الطلبات", icon: ShoppingBag },
-    { to: "/admin/settings", label: "الإعدادات", icon: Settings },
+    // { to: "/admin/settings", label: "الإعدادات", icon: Settings },
   ];
 
   return (
     <aside
       className={cn(
-        "bg-primary-sidebar text-white rounded-l-[20px] flex flex-col h-full transition-all duration-300 ease-in-out select-none",
+        "bg-primary text-white rounded-l-[20px] flex flex-col h-full transition-all duration-300 ease-in-out select-none",
         collapsed ? "w-20" : "w-64"
       )}
     >
