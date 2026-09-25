@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   useGetPlansQuery,
+  useGetClassesQuery,
   useGetSubscriptionsQuery,
   useGetOrdersQuery,
   useCreateOrderMutation,
@@ -10,19 +11,42 @@ import PlanCard from "../../components/subscriptions/PlanCard";
 import Skeleton from "../../components/common/Skeleton";
 import Modal from "../../components/common/Modal";
 import Button from "../../components/common/Button";
+import Select from "../../components/common/Select";
 import { formatPrice } from "../../utils/cn";
 import { useNavigate } from "react-router-dom";
 
 export default function SubscriptionPlansPage() {
-  const { data: plansData, isLoading } = useGetPlansQuery();
+  const { data: plansData, isLoading: isLoadingPlans } = useGetPlansQuery();
+  const { data: classesData, isLoading: isLoadingClasses } = useGetClassesQuery();
   const { data: subsData } = useGetSubscriptionsQuery();
   const { data: ordersData } = useGetOrdersQuery();
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
 
   const plans = plansData?.data || plansData || [];
+  const classes = classesData?.data || classesData || [];
   const subscriptions = subsData?.data || subsData || [];
   const orders = ordersData?.data || ordersData || [];
   const navigate = useNavigate();
+
+  const [selectedClassId, setSelectedClassId] = useState("all");
+
+  const classOptions = [
+    { value: "all", label: "جميع الصفوف الدراسية" },
+    ...(Array.isArray(classes)
+      ? classes.map((cls) => ({
+          value: String(cls.id),
+          label: cls.name,
+        }))
+      : []),
+  ];
+
+  const filteredPlans = Array.isArray(plans)
+    ? selectedClassId === "all"
+      ? plans
+      : plans.filter(
+          (p) => String(p.class?.id || p.class_id) === String(selectedClassId)
+        )
+    : [];
 
   const activePlanIds = subscriptions
     .filter((s) => s.status === "active")
@@ -60,6 +84,8 @@ export default function SubscriptionPlansPage() {
     }
   };
 
+  const isLoading = isLoadingPlans || isLoadingClasses;
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -71,15 +97,26 @@ export default function SubscriptionPlansPage() {
         ]}
       />
 
+      {/* Class Filter Select */}
+      <div className="w-full sm:w-72">
+        <Select
+          label="تصفية حسب الصف الدراسي"
+          options={classOptions}
+          value={selectedClassId}
+          onChange={(e) => setSelectedClassId(e.target.value)}
+          placeholder="اختر الصف الدراسي..."
+        />
+      </div>
+
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Skeleton className="h-80 rounded-2xl" />
           <Skeleton className="h-80 rounded-2xl" />
           <Skeleton className="h-80 rounded-2xl" />
         </div>
-      ) : plans.length > 0 ? (
+      ) : filteredPlans.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {plans.map((plan) => (
+          {filteredPlans.map((plan) => (
             <PlanCard
               key={plan.id}
               plan={plan}
@@ -91,7 +128,7 @@ export default function SubscriptionPlansPage() {
         </div>
       ) : (
         <div className="p-12 text-center bg-white border border-surface-border rounded-2xl text-textSecondary text-sm">
-          لا توجد خطط اشتراك متاحة حالياً
+          لا توجد خطط اشتراك متاحة لهذا الصف حالياً
         </div>
       )}
 
