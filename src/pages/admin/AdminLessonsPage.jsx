@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   useGetLessonsQuery,
   useGetClassesQuery,
+  useGetPeriodsQuery,
+  useCreatePeriodMutation,
   useGetMeQuery,
   useDeleteLessonMutation,
   usePublishLessonMutation,
@@ -13,8 +15,10 @@ import Table from "../../components/tables/Table";
 import Button from "../../components/common/Button";
 import Badge from "../../components/common/Badge";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import Modal from "../../components/common/Modal";
+import Input from "../../components/common/Input";
 import Select from "../../components/common/Select";
-import { Plus, Eye, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Eye, Edit, Trash2, CheckCircle, XCircle, Calendar } from "lucide-react";
 import { formatDate } from "../../utils/cn";
 
 export default function AdminLessonsPage() {
@@ -22,9 +26,19 @@ export default function AdminLessonsPage() {
   const { data: meData } = useGetMeQuery();
   const { data: lessonsData, isLoading } = useGetLessonsQuery();
   const { data: classesData } = useGetClassesQuery();
+  const { data: periodsData } = useGetPeriodsQuery();
+  const [createPeriod, { isLoading: isCreatingPeriod }] = useCreatePeriodMutation();
   const [deleteLesson, { isLoading: isDeleting }] = useDeleteLessonMutation();
   const [publishLesson] = usePublishLessonMutation();
   const [unpublishLesson] = useUnpublishLessonMutation();
+
+  const [isPeriodModalOpen, setIsPeriodModalOpen] = useState(false);
+  const [periodType, setPeriodType] = useState("month");
+  const [periodParentId, setPeriodParentId] = useState("");
+  const [periodClassId, setPeriodClassId] = useState("");
+  const [periodStartDate, setPeriodStartDate] = useState("");
+  const [periodEndDate, setPeriodEndDate] = useState("");
+  const [periodErrorMsg, setPeriodErrorMsg] = useState("");
 
   const [selectedClassId, setSelectedClassId] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -99,6 +113,51 @@ export default function AdminLessonsPage() {
 
     return true;
   });
+
+  const periods = periodsData?.data || periodsData || [];
+
+  const parentOptions = Array.isArray(periods)
+    ? periods.map((p) => ({
+        value: String(p.id),
+        label: `(${p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر"})`,
+      }))
+    : [];
+
+  const handleOpenAddPeriod = () => {
+    setPeriodType("month");
+    setPeriodParentId("");
+    setPeriodClassId(classOptions[0]?.value || "");
+    setPeriodStartDate("");
+    setPeriodEndDate("");
+    setPeriodErrorMsg("");
+    setIsPeriodModalOpen(true);
+  };
+
+  const handlePeriodSubmit = async (e) => {
+    e.preventDefault();
+    setPeriodErrorMsg("");
+    if (!periodClassId) {
+      setPeriodErrorMsg("يرجى تحديد الصف الدراسي");
+      return;
+    }
+
+    try {
+      const payload = {
+        type: periodType,
+        class_id: periodClassId,
+        parent_period_id: periodParentId || null,
+        start_date: periodStartDate || null,
+        end_date: periodEndDate || null,
+      };
+
+      await createPeriod(payload).unwrap();
+      setIsPeriodModalOpen(false);
+    } catch (err) {
+      setPeriodErrorMsg(
+        err.data?.message || err.message || "حدث خطأ أثناء حفظ الفترة الدراسية"
+      );
+    }
+  };
 
   const [lessonToDelete, setLessonToDelete] = useState(null);
 
@@ -223,12 +282,23 @@ export default function AdminLessonsPage() {
         title="إدارة الدروس التعليمية"
         subtitle="إنشاء، تعديل، ونشر شروحات الدروس ومرفقاتها"
         action={
-          <Link to="/admin/lessons/create">
-            <Button variant="primary" size="md" className="gap-2">
-              <Plus className="w-4 h-4" />
-              إضافة درس جديد
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={handleOpenAddPeriod}
+              className="gap-2 border-primary/20 hover:border-primary/40 text-primary"
+            >
+              <Calendar className="w-4 h-4 text-cyanAccent" />
+              إضافة فترة دراسية
             </Button>
-          </Link>
+            <Link to="/admin/lessons/create">
+              <Button variant="primary" size="md" className="gap-2">
+                <Plus className="w-4 h-4" />
+                إضافة درس جديد
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -300,6 +370,82 @@ export default function AdminLessonsPage() {
         confirmText="حذف الدرس"
         isLoading={isDeleting}
       />
+
+      {/* Add Period Modal */}
+      <Modal
+        isOpen={isPeriodModalOpen}
+        onClose={() => setIsPeriodModalOpen(false)}
+        title="إضافة فترة دراسية جديدة"
+      >
+        <form onSubmit={handlePeriodSubmit} className="space-y-4">
+          {periodErrorMsg && (
+            <div className="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-semibold">
+              {periodErrorMsg}
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <Select
+              label="النوع"
+              options={[
+                { value: "year", label: "سنة دراسية" },
+                { value: "term", label: "ترم دراسي" },
+                { value: "month", label: "شهر" },
+              ]}
+              value={periodType}
+              onChange={(e) => setPeriodType(e.target.value)}
+            />
+
+            <Select
+              label="الصف الدراسي"
+              options={classOptions}
+              value={periodClassId}
+              onChange={(e) => setPeriodClassId(e.target.value)}
+              required
+            />
+          </div>
+
+          <Select
+            label="الفترة الأب (إن وجدت)"
+            options={parentOptions}
+            value={periodParentId}
+            onChange={(e) => setPeriodParentId(e.target.value)}
+            placeholder="بدون فترة أب (فترة رئيسية)"
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="تاريخ البداية"
+              type="date"
+              value={periodStartDate || new Date().toISOString().split("T")[0]}
+              onChange={(e) => setPeriodStartDate(e.target.value)}
+            />
+            <Input
+              label="تاريخ النهاية"
+              type="date"
+              value={periodEndDate}
+              onChange={(e) => setPeriodEndDate(e.target.value)}
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-surface-border">
+            <Button
+              variant="outline"
+              onClick={() => setIsPeriodModalOpen(false)}
+              disabled={isCreatingPeriod}
+            >
+              إلغاء
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={isCreatingPeriod}
+            >
+              حفظ
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

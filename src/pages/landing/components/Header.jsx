@@ -101,18 +101,14 @@ const Header = () => {
       >
         <nav className="flex flex-col px-5 py-4">
           {navLinks.map((link) => (
-            <NavLink
+            <a
               key={link.path}
-              to={link.path}
+              href={`#${link.path}`}
               onClick={() => setOpen(false)}
-              className={({ isActive }) =>
-                `border-b border-[#587aa9]/20 py-4 text-sm ${
-                  isActive ? "font-bold text-[#f1c40f]" : "text-white"
-                }`
-              }
+              className={`border-b border-[#587aa9]/20 py-4 text-sm text-white`}
             >
               {link.name}
-            </NavLink>
+            </a>
           ))}
 
           <Link
