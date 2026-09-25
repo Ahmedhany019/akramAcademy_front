@@ -260,7 +260,7 @@ export default function AdminUnitsPage() {
                     thumbnailPreview.startsWith("blob:") ||
                     thumbnailPreview.startsWith("http")
                       ? thumbnailPreview
-                      : `http://localhost:8000${thumbnailPreview}`
+                      : `${BASE_URL}${thumbnailPreview}`
                   }
                   alt="Preview"
                   className="w-24 h-24 object-cover rounded-xl border border-gray-200 shadow-sm"
