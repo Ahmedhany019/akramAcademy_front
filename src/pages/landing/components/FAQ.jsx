@@ -33,7 +33,7 @@ const FAQ = () => {
   };
 
   return (
-    <section dir="rtl" className="w-full bg-white py-16 px-4 md:px-8 border-t border-gray-100">
+    <section id="faq" dir="rtl" className="w-full bg-white py-16 px-4 md:px-8 border-t border-gray-100 scroll-mt-[90px]">
       <div className="max-w-[900px] mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">

@@ -3,9 +3,9 @@ import { about, certificate1, certificate2, line } from "../../../assets/images"
 
 const About = () => {
   return (
-    <div className="md:px-8 py-6 mx-auto bg-[#0f1d41]">
+    <div id="about" className="md:px-8 py-6 mx-auto bg-[#0f1d41] scroll-mt-[90px]">
       <div className="flex mt-10 flex-col md:flex-row gap-8 w-full h-full justify-between items-center text-white">
-        <div className="flex-1 flex items-center justify-center">
+        <div id="certificates" className="flex-1 flex items-center justify-center scroll-mt-[100px]">
           <div className="relative w-full max-w-[720px] rounded-2xl border border-[#587aa9] px-5 pb-5 pt-8">
 
             {/* Title */}

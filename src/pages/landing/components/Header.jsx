@@ -1,25 +1,16 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import {
-  Phone,
-  Facebook,
-  Youtube,
-  Menu,
-  X,
-  ArrowRight,
-} from "lucide-react";
+import { Phone, Facebook, Youtube, Menu, X, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
 
   const navLinks = [
-    { name: "الرئيسية", path: "/" },
-    { name: "من أنا", path: "/about" },
-    { name: "الكورسات", path: "/courses" },
-    { name: "المواد", path: "/subjects" },
-    { name: "الشهادات", path: "/certificates" },
-    { name: "التواصل", path: "/contact" },
+    { name: "الرئيسية", path: "" },
+    { name: "الكورسات", path: "courses" },
+    { name: "من أنا", path: "about" },
+    { name: "التواصل", path: "contact" },
   ];
 
   return (
@@ -28,14 +19,11 @@ const Header = () => {
       className="fixed z-[999] top-0  w-full bg-[#0f1d41] text-white shadow-lg"
     >
       <div className="mx-auto flex h-[90px] max-w-[1250px] items-center justify-between px-5">
-
         {/* Logo */}
         <NavLink to="/" className="shrink-0">
           <div className="flex items-center gap-3">
             <div className="relative flex h-16 w-16 items-center justify-center">
-              <span className="absolute -top-1 text-2xl text-[#f1c40f]">
-                ♛
-              </span>
+              <span className="absolute -top-1 text-2xl text-[#f1c40f]">♛</span>
 
               <span
                 className="font-serif text-5xl italic text-white"
@@ -46,17 +34,11 @@ const Header = () => {
             </div>
 
             <div className="hidden sm:block text-left">
-              <h1 className="text-lg font-semibold leading-tight">
-                Monsieur
-              </h1>
+              <h1 className="text-lg font-semibold leading-tight">Monsieur</h1>
 
-              <h2 className="text-xl font-bold leading-tight">
-                Akram Ibrahim
-              </h2>
+              <h2 className="text-xl font-bold leading-tight">Akram Ibrahim</h2>
 
-              <p className="text-sm text-[#587aa9]">
-                Professeur de français
-              </p>
+              <p className="text-sm text-[#587aa9]">Professeur de français</p>
             </div>
           </div>
         </NavLink>
@@ -64,37 +46,20 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8">
           {navLinks.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              className={({ isActive }) =>
-                `group relative py-3 text-sm font-medium transition-colors duration-300 ${
-                  isActive
-                    ? "text-[#f1c40f]"
-                    : "text-white hover:text-[#f1c40f]"
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  {link.name}
+    <a
+      key={link.id}
+      href={`#${link.path}`}
+      className="group relative py-3 text-sm font-medium text-white transition-colors duration-300 hover:text-[#f1c40f]"
+    >
+      {link.name}
 
-                  <span
-                    className={`absolute -bottom-1 right-0 h-[2px] bg-[#f1c40f] transition-all duration-300 ${
-                      isActive
-                        ? "w-full"
-                        : "w-0 group-hover:w-full"
-                    }`}
-                  />
-                </>
-              )}
-            </NavLink>
-          ))}
+      <span className="absolute -bottom-1 right-0 h-[2px] w-0 bg-[#f1c40f] transition-all duration-300 group-hover:w-full" />
+    </a>
+  ))}
         </nav>
 
         {/* Right Actions */}
         <div className="hidden lg:flex items-center gap-3">
-
           <Link
             to="/register"
             className="flex items-center gap-2 rounded-full bg-[#f1c40f] px-6 py-3 text-sm font-bold text-[#0f1d41] transition-all duration-300 hover:scale-105 hover:bg-[#dcb20c]"
@@ -135,7 +100,6 @@ const Header = () => {
         }`}
       >
         <nav className="flex flex-col px-5 py-4">
-
           {navLinks.map((link) => (
             <NavLink
               key={link.path}
@@ -143,9 +107,7 @@ const Header = () => {
               onClick={() => setOpen(false)}
               className={({ isActive }) =>
                 `border-b border-[#587aa9]/20 py-4 text-sm ${
-                  isActive
-                    ? "font-bold text-[#f1c40f]"
-                    : "text-white"
+                  isActive ? "font-bold text-[#f1c40f]" : "text-white"
                 }`
               }
             >

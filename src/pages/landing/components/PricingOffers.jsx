@@ -39,7 +39,7 @@ const PricingOffers = () => {
     : "http://localhost:8000";
 
   return (
-    <section dir="rtl" className="w-full bg-[#f8fafc] py-20 px-4 md:px-8 border-t border-slate-200/60">
+    <section id="courses" dir="rtl" className="w-full bg-[#f8fafc] py-20 px-4 md:px-8 border-t border-slate-200/60 scroll-mt-[90px]">
       <div className="max-w-[1250px] mx-auto">
         {/* Login And Register */}
         <div className="flex justify-center mb-6">
@@ -80,7 +80,7 @@ const PricingOffers = () => {
         ) : (
           <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-14">
             {Array.isArray(classes) &&
-              classes.map((cls) => {
+              classes.slice(0,8).map((cls) => {
                 const isActive = String(selectedClassId) === String(cls.id);
                 return (
                   <button

@@ -11,6 +11,9 @@
     font-family: 'Tajawal', 'Cairo', sans-serif;
   }
 }
+*{
+  scroll-behavior: smooth;
+}
 
 /* Custom scrollbars for clean modern feel */
 ::-webkit-scrollbar {

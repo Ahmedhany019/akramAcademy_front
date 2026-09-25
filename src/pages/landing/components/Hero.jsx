@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 const Hero = () => {
   return (
     <main
+      id="home"
       style={{ backgroundImage: `url(${hero})` }}
       className="w-full bg-no-repeat bg-right h-[80vh] mt-[89px] relative flex flex-col items-center justify-center z-[99]"
     >
