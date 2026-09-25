@@ -21,7 +21,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="مرحباً أستاذ أحمد 👋"
+        title="مرحباً أستاذ أكرم 👋"
         subtitle="إدارة منصتك التعليمية من مكان واحد"
       />
 
