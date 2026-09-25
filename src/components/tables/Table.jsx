@@ -40,6 +40,7 @@ export default function Table({
         <table className="w-full text-right border-collapse text-sm">
           <thead>
             <tr className="bg-gray-50/75 border-b border-surface-border text-xs font-semibold text-textSecondary uppercase tracking-wider">
+              
               {columns.map((col, idx) => (
                 <th
                   key={idx}

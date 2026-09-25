@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 import { useGetStudentsQuery } from "../../redux/api/apiSlice";
 import PageHeader from "../../components/common/PageHeader";
 import Table from "../../components/tables/Table";
 import Button from "../../components/common/Button";
 import Badge from "../../components/common/Badge";
 import Input from "../../components/common/Input";
-import { Eye, Search } from "lucide-react";
+import { Eye, Search, FileSpreadsheet } from "lucide-react";
 
 export default function AdminStudentsPage() {
   const navigate = useNavigate();
@@ -33,6 +34,38 @@ export default function AdminStudentsPage() {
     const parentPhoneMatch = student.parent_phone?.includes(term);
     return nameMatch || phoneMatch || parentPhoneMatch;
   });
+
+  const handleExportExcel = () => {
+    const exportData = (filteredStudents.length > 0 ? filteredStudents : students).map(
+      (student, index) => ({
+        "م": index + 1,
+        "اسم الطالب": student.name || "-",
+        "رقم الهاتف": student.phone || "-",
+        "رقم ولي الأمر": student.parent_phone || "-",
+        "الصف الدراسي": student.grade_level || student.class?.name || "-",
+        "حالة الحساب": student.status === "active" || !student.status ? "مفعل" : "معطل",
+        "تاريخ التسجيل": student.created_at
+          ? new Date(student.created_at).toLocaleDateString("ar-EG")
+          : "-",
+      })
+    );
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    worksheet["!cols"] = [
+      { wch: 6 },
+      { wch: 25 },
+      { wch: 16 },
+      { wch: 16 },
+      { wch: 18 },
+      { wch: 14 },
+      { wch: 16 },
+    ];
+    worksheet["!dir"] = "rtl";
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "الطلاب");
+    XLSX.writeFile(workbook, `قائمة_الطلاب_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
 
   const columns = [
     {
@@ -86,6 +119,18 @@ export default function AdminStudentsPage() {
       <PageHeader
         title="إدارة الطلاب"
         subtitle="عرض قائمة الطلاب المسجلين بالمنصة وتفاصيل اشتراكاتهم"
+        action={
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={handleExportExcel}
+            disabled={students.length === 0 || isLoading}
+            className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-sm"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            تصدير إلى Excel
+          </Button>
+        }
       />
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-2xl border border-surface-border shadow-soft">

@@ -6,10 +6,13 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   plugins: [react(),VitePWA({
     registerType: "autoUpdate",
+    workbox: {
+    navigateFallbackDenylist: [/^\/api\//],
+  },
 
     manifest: {
-      name: "EduPress",
-      short_name: "EduPress",
+      name: "akramibrahimofficial",
+      short_name: "akramibrahimofficial",
       description: "Educational Platform",
       theme_color: "#ffffff",
       background_color: "#ffffff",

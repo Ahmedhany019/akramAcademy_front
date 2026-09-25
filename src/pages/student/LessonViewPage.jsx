@@ -68,6 +68,10 @@ export default function LessonViewPage() {
       : `${apiOrigin}${rawPdfUrl}`
     : null;
 
+    console.log("PDF DATA:", pdfData);
+console.log("RAW PDF URL:", rawPdfUrl);
+console.log("FINAL PDF URL:", pdfUrl);
+
   if (loadingLesson) {
     return (
       <div className="space-y-6">
