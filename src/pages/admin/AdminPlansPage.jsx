@@ -167,7 +167,7 @@ export default function AdminPlansPage() {
       ),
     },
     {
-      header: "الحالة",
+      header: "الحالةةة",
       accessor: "status",
       render: (row) => (
         <Badge variant={row.status === "active" ? "success" : "neutral"}>
