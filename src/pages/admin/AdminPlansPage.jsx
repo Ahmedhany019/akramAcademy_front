@@ -112,8 +112,8 @@ export default function AdminPlansPage() {
       const payload = {
         name,
         price: Number(price),
-        class_id: classId,
-        period_id: periodId || null,
+        class_id: Number(classId),
+        period_id: periodId ? Number(periodId) : null,
         status,
       };
 
@@ -241,7 +241,22 @@ export default function AdminPlansPage() {
               label="الصف الدراسي"
               options={classOptions}
               value={classId}
-              onChange={(e) => setClassId(e.target.value)}
+              onChange={(e) => {
+                const newClassId = e.target.value;
+
+                setClassId(newClassId);
+
+                const classPeriods = periods.filter(
+                  (p) =>
+                    String(p.class_id || p.class?.id) === String(newClassId)
+                );
+
+                setPeriodId(
+                  classPeriods.length > 0
+                    ? String(classPeriods[0].id)
+                    : ""
+                );
+              }}
               required
             />
             <Select
