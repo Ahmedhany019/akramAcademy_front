@@ -67,7 +67,7 @@ export default function AdminPlansPage() {
     : [];
 
   const periodOptions = [
-    { value: "", label: "بدون فترة محددة (اختياري)" },
+    { value: "", label: "بدون فترة محددة" },
     ...availablePeriods.map((p) => {
       const typeLabel =
         p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر";
@@ -167,7 +167,7 @@ export default function AdminPlansPage() {
       ),
     },
     {
-      header: "الحالةةة",
+      header: "الحالة",
       accessor: "status",
       render: (row) => (
         <Badge variant={row.status === "active" ? "success" : "neutral"}>
@@ -175,21 +175,21 @@ export default function AdminPlansPage() {
         </Badge>
       ),
     },
-    {
-      header: "الإجراءات",
-      accessor: "actions",
-      render: (row) => (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleOpenEdit(row)}
-          className="gap-1.5"
-        >
-          <Edit2 className="w-3.5 h-3.5" />
-          تعديل
-        </Button>
-      ),
-    },
+    // {
+    //   header: "الإجراءات",
+    //   accessor: "actions",
+    //   render: (row) => (
+    //     <Button
+    //       variant="outline"
+    //       size="sm"
+    //       onClick={() => handleOpenEdit(row)}
+    //       className="gap-1.5"
+    //     >
+    //       <Edit2 className="w-3.5 h-3.5" />
+    //       تعديل
+    //     </Button>
+    //   ),
+    // },
   ];
 
   return (

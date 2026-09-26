@@ -70,7 +70,7 @@ export default function EditLessonPage() {
   }, [probeUnitsData]);
 
   const { data: unitsData } = useGetClassUnitsQuery(classId, { skip: !classId });
-  const { data: periodsData } = useGetPeriodsQuery({ classId }, { skip: !classId });
+  const { data: periodsData } = useGetPeriodsQuery();
 
   const units = Array.isArray(unitsData?.data)
     ? unitsData.data
@@ -112,9 +112,16 @@ export default function EditLessonPage() {
     ? units.map((u) => ({ value: String(u.id), label: u.name }))
     : [];
 
-  const periodOptions = Array.isArray(periods)
-    ? periods.map((p) => ({ value: String(p.id), label: p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر" }))
+  const filteredPeriods = Array.isArray(periods)
+    ? classId
+      ? periods.filter((p) => String(p.class_id || p.class?.id) === String(classId))
+      : periods
     : [];
+
+  const periodOptions = filteredPeriods.map((p) => ({
+    value: String(p.id),
+    label: p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر",
+  }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -297,7 +304,7 @@ export default function EditLessonPage() {
               />
 
               <Select
-                label="الفترة الدراسية (اختياري)"
+                label="الفترة الدراسية"
                 options={periodOptions}
                 value={periodId}
                 onChange={(e) => setPeriodId(e.target.value)}

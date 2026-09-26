@@ -41,11 +41,19 @@ export default function AdminPeriodsPage() {
 
   const parentOptions = Array.isArray(periods)
     ? periods
-        .filter((p) => !editingPeriod || p.id !== editingPeriod.id)
-        .map((p) => ({
-          value: String(p.id),
-          label: `(${p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر"})`,
-        }))
+        .filter(
+          (p) =>
+            (!editingPeriod || String(p.id) !== String(editingPeriod.id)) &&
+            (!classId || String(p.class_id || p.class?.id) === String(classId))
+        )
+        .map((p) => {
+          const typeLabel = p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر";
+          const dateRange = p.start_date && p.end_date ? ` (${formatDate(p.start_date)} - ${formatDate(p.end_date)})` : "";
+          return {
+            value: String(p.id),
+            label: `${typeLabel}${dateRange}`,
+          };
+        })
     : [];
 
   const handleOpenAdd = () => {
@@ -245,7 +253,10 @@ export default function AdminPeriodsPage() {
               label="الصف الدراسي"
               options={classOptions}
               value={classId}
-              onChange={(e) => setClassId(e.target.value)}
+              onChange={(e) => {
+                setClassId(e.target.value);
+                setParentId("");
+              }}
               required
             />
           </div>

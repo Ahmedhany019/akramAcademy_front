@@ -15,6 +15,7 @@ import Select from "../../components/common/Select";
 import FileUpload from "../../components/forms/FileUpload";
 import Button from "../../components/common/Button";
 import LessonVideo from "../../components/lessons/LessonVideo";
+import { formatDate } from "../../utils/cn";
 
 export default function CreateLessonPage() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function CreateLessonPage() {
 
   const { data: classesData } = useGetClassesQuery();
   const { data: unitsData } = useGetClassUnitsQuery(classId, { skip: !classId });
-  const { data: periodsData } = useGetPeriodsQuery({ classId }, { skip: !classId });
+  const { data: periodsData } = useGetPeriodsQuery();
 
   const classes = classesData?.data || classesData || [];
   const units = Array.isArray(unitsData?.data)
@@ -58,9 +59,16 @@ export default function CreateLessonPage() {
     ? units.map((u) => ({ value: String(u.id), label: u.name }))
     : [];
 
-  const periodOptions = Array.isArray(periods)
-    ? periods.map((p) => ({ value: String(p.id), label: p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر" }))
+  const filteredPeriods = Array.isArray(periods)
+    ? classId
+      ? periods.filter((p) => String(p.class_id || p.class?.id) === String(classId))
+      : periods
     : [];
+
+  const periodOptions = filteredPeriods.map((p) => ({
+    value: String(p.id),
+    label: `${p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر"} (${formatDate(p.start_date)} - ${formatDate(p.end_date)})`,
+  }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -239,7 +247,7 @@ export default function CreateLessonPage() {
               />
 
               <Select
-                label="الفترة الدراسية (اختياري)"
+                label="الفترة الدراسية"
                 options={periodOptions}
                 value={periodId}
                 onChange={(e) => setPeriodId(e.target.value)}
