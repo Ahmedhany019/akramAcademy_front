@@ -53,24 +53,34 @@ export default function AdminPlansPage() {
     ? selectedClassFilter === "all"
       ? plans
       : plans.filter(
-          (p) => String(p.class?.id || p.class_id) === String(selectedClassFilter)
+          (p) =>
+            String(p.class?.id || p.class_id) === String(selectedClassFilter),
         )
     : [];
 
   const availablePeriods = Array.isArray(periods)
     ? classId
-      ? periods.filter((p) => String(p.class_id || p.class?.id) === String(classId))
+      ? periods.filter(
+          (p) => String(p.class_id || p.class?.id) === String(classId),
+        )
       : periods
     : [];
 
-  const periodOptions = availablePeriods.map((p) => {
-    const typeLabel = p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر";
-    const dateRange = p.start_date && p.end_date ? ` (${formatDate(p.start_date)} - ${formatDate(p.end_date)})` : "";
-    return {
-      value: String(p.id),
-      label: `${typeLabel}${dateRange}`,
-    };
-  });
+  const periodOptions = [
+    { value: "", label: "بدون فترة محددة (اختياري)" },
+    ...availablePeriods.map((p) => {
+      const typeLabel =
+        p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر";
+      const dateRange =
+        p.start_date && p.end_date
+          ? ` (${formatDate(p.start_date)} - ${formatDate(p.end_date)})`
+          : "";
+      return {
+        value: String(p.id),
+        label: `${typeLabel}${dateRange}`,
+      };
+    }),
+  ];
 
   const handleOpenAdd = () => {
     setEditingPlan(null);
@@ -78,11 +88,8 @@ export default function AdminPlansPage() {
     setPrice("");
     const initialClassId = classOptions[0]?.value || "";
     setClassId(initialClassId);
-    
-    const initialPeriods = Array.isArray(periods)
-      ? periods.filter((p) => String(p.class_id || p.class?.id) === String(initialClassId))
-      : [];
-    setPeriodId(initialPeriods[0] ? String(initialPeriods[0].id) : "");
+
+    setPeriodId("");
     setStatus("active");
     setErrorMsg("");
     setIsModalOpen(true);
@@ -125,7 +132,7 @@ export default function AdminPlansPage() {
       setIsModalOpen(false);
     } catch (err) {
       setErrorMsg(
-        err.data?.message || err.message || "حدث خطأ أثناء حفظ خطة الاشتراك"
+        err.data?.message || err.message || "حدث خطأ أثناء حفظ خطة الاشتراك",
       );
     }
   };
@@ -134,7 +141,9 @@ export default function AdminPlansPage() {
     {
       header: "اسم الخطة",
       accessor: "name",
-      render: (row) => <span className="font-bold text-primary">{row.name}</span>,
+      render: (row) => (
+        <span className="font-bold text-primary">{row.name}</span>
+      ),
     },
     {
       header: "الفصل",
@@ -144,7 +153,9 @@ export default function AdminPlansPage() {
     {
       header: "الفترة",
       accessor: "period",
-      render: (row) => `${formatDate(row.period?.start_date)} - ${formatDate(row.period?.end_date)}` || "-",
+      render: (row) =>
+        `${formatDate(row.period?.start_date)} - ${formatDate(row.period?.end_date)}` ||
+        "-",
     },
     {
       header: "السعر",
@@ -187,7 +198,12 @@ export default function AdminPlansPage() {
         title="إدارة خطط الاشتراك"
         subtitle="تحديد باقات وأسعار الفترات الدراسية"
         action={
-          <Button variant="primary" size="md" onClick={handleOpenAdd} className="gap-2">
+          <Button
+            variant="primary"
+            size="md"
+            onClick={handleOpenAdd}
+            className="gap-2"
+          >
             <Plus className="w-4 h-4" />
             إضافة خطة
           </Button>
@@ -242,20 +258,8 @@ export default function AdminPlansPage() {
               options={classOptions}
               value={classId}
               onChange={(e) => {
-                const newClassId = e.target.value;
-
-                setClassId(newClassId);
-
-                const classPeriods = periods.filter(
-                  (p) =>
-                    String(p.class_id || p.class?.id) === String(newClassId)
-                );
-
-                setPeriodId(
-                  classPeriods.length > 0
-                    ? String(classPeriods[0].id)
-                    : ""
-                );
+                setClassId(e.target.value);
+                setPeriodId("");
               }}
               required
             />
