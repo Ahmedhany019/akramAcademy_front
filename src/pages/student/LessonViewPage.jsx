@@ -12,9 +12,12 @@ import Skeleton from "../../components/common/Skeleton";
 import ErrorState from "../../components/common/ErrorState";
 import Button from "../../components/common/Button";
 import { ChevronRight, ChevronLeft, BookOpen, Layers } from "lucide-react";
+import { useSelector } from "react-redux";
 
 export default function LessonViewPage() {
   const { lessonId } = useParams();
+  const user = useSelector((state) => state.auth.user);
+  const isAdmin = user?.role === "admin";
 
   const {
     data: lessonData,
@@ -24,7 +27,7 @@ export default function LessonViewPage() {
   } = useGetLessonQuery(lessonId);
 
   const lesson = lessonData?.data || lessonData;
-  const hasAccess = lesson?.has_access ?? false;
+  const hasAccess = isAdmin || (lesson?.has_access ?? false);
 
   const {
     data: pdfData,

@@ -32,8 +32,18 @@ export default function Navbar({ title }) {
         )}
       </div>
 
-      {/* User profile capsule */}
+      {/* User profile capsule and portal switcher */}
       <div className="flex items-center gap-3">
+        {user?.role === "admin" && (
+          <a
+            href={window.location.pathname.startsWith("/admin") ? "/student" : "/admin"}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-primary/5 hover:bg-cyanAccent hover:text-white text-primary border border-surface-border hover:border-cyanAccent"
+          >
+            {window.location.pathname.startsWith("/admin")
+              ? "🎓 عرض منصة الطالب"
+              : "⚙️ لوحة الإدارة"}
+          </a>
+        )}
         <div className="flex items-center gap-2.5 bg-gray-50 border border-surface-border px-3 py-1.5 rounded-xl">
           <UserCircle className="w-6 h-6 text-primary" />
           <div className="text-right">

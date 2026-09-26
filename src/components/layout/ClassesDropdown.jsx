@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { ChevronDown, GraduationCap } from "lucide-react";
-import { useGetClassesQuery } from "../../redux/api/apiSlice";
+import { useGetClassesQuery, useGetMeQuery } from "../../redux/api/apiSlice";
 import Skeleton from "../common/Skeleton";
 import { cn } from "../../utils/cn";
 
@@ -10,8 +10,18 @@ export default function ClassesDropdown({ onItemClick, collapsed = false }) {
   const isClassesActive = location.pathname.startsWith("/classes");
   const [isOpen, setIsOpen] = useState(isClassesActive);
 
+  const { data: meData } = useGetMeQuery();
+  const user = meData?.data?.user || meData?.user || meData?.data || {};
+  const studentGradeId = user?.profile?.grade_level || user?.grade_level || user?.profile?.grade_level_id || user?.class_id;
+
   const { data: classesResponse, isLoading } = useGetClassesQuery();
-  const classes = classesResponse?.data || classesResponse || [];
+  const allClasses = classesResponse?.data || classesResponse || [];
+
+  const classes = Array.isArray(allClasses)
+    ? user?.role === "admin" || !studentGradeId
+      ? allClasses
+      : allClasses.filter((c) => String(c.id) === String(studentGradeId))
+    : [];
 
   // Group classes into الثانوية (بكالوريا، أزهر، عام)، الإعدادية، الابتدائية
   const groupClasses = (list) => {

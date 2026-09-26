@@ -4,6 +4,7 @@ import {
   useGetClassesQuery,
   useGetClassUnitsQuery,
   useGetPeriodsQuery,
+  useGetSubscriptionsQuery,
 } from "../../redux/api/apiSlice";
 import PageHeader from "../../components/common/PageHeader";
 import Skeleton from "../../components/common/Skeleton";
@@ -15,17 +16,34 @@ import {
   ArrowLeft,
   ArrowRight,
   BookOpen,
+  CreditCard,
 } from "lucide-react";
-import { cn } from "../../utils/cn";
+import { cn, formatDate } from "../../utils/cn";
+import { useSelector } from "react-redux";
 
 export default function ClassContentPage() {
   const { classId: rawClassId, unitId } = useParams();
+  const user = useSelector((state) => state.auth.user);
+  const isAdmin = user?.role === "admin";
 
   const { data: classesData } = useGetClassesQuery();
   const classes = classesData?.data || classesData || [];
 
   // When viewing a specific unit directly via /units/:unitId, find its classId
   const effectiveClassId = rawClassId;
+
+  const { data: subsData } = useGetSubscriptionsQuery();
+  const subscriptions = subsData?.data || subsData || [];
+  const hasActiveSubscription = isAdmin || (Array.isArray(subscriptions)
+    ? subscriptions.some(
+        (s) =>
+          s.status === "active" &&
+          (
+            String(s.plan?.class_id || s.plan?.class?.id) === String(effectiveClassId) ||
+            String(s.class_id) === String(effectiveClassId)
+          )
+      )
+    : false);
 
   const { data: unitsData, isLoading: loadingUnits } = useGetClassUnitsQuery(
     effectiveClassId,
@@ -35,8 +53,16 @@ export default function ClassContentPage() {
     useGetPeriodsQuery();
     // { skip: !effectiveClassId }
 
-  const units = unitsData?.data.units || unitsData || [];
-  const periods = periodsData?.data || periodsData || [];
+  const units = unitsData?.data?.units || unitsData?.data || unitsData || [];
+  const allPeriods = periodsData?.data || periodsData || [];
+
+  const periods = Array.isArray(allPeriods)
+    ? effectiveClassId
+      ? allPeriods.filter(
+          (p) => String(p.class_id || p.class?.id) === String(effectiveClassId)
+        )
+      : allPeriods
+    : [];
 
   const currentClass = Array.isArray(classes)
     ? classes.find((c) => String(c.id) === String(effectiveClassId))
@@ -120,24 +146,34 @@ export default function ClassContentPage() {
             >
               الكل
             </button>
-            {periods.map((period) => (
-              <button
-                key={period.id}
-                onClick={() => setSelectedPeriodId(period.id)}
-                className={cn(
-                  "px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors border",
-                  selectedPeriodId === period.id
-                    ? "bg-cyanAccent text-white border-cyanAccent"
-                    : "bg-gray-50 text-textSecondary border-surface-border hover:bg-gray-100",
-                )}
-              >
-                {period.type === "year"
+            {periods.map((period) => {
+              const typeLabel =
+                period.type === "year"
                   ? "العام الدراسي"
                   : period.type === "term"
                     ? "الفصل الدراسي"
-                    : "الشهر"}
-              </button>
-            ))}
+                    : "الشهر";
+              const dateRange =
+                period.start_date && period.end_date
+                  ? ` (${formatDate(period.start_date)} - ${formatDate(period.end_date)})`
+                  : "";
+
+              return (
+                <button
+                  key={period.id}
+                  onClick={() => setSelectedPeriodId(period.id)}
+                  className={cn(
+                    "px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors border",
+                    selectedPeriodId === period.id
+                      ? "bg-cyanAccent text-white border-cyanAccent"
+                      : "bg-gray-50 text-textSecondary border-surface-border hover:bg-gray-100",
+                  )}
+                >
+                  {typeLabel}
+                  {dateRange}
+                </button>
+              );
+            })}
           </div>
         ) : (
           <p className="text-xs text-textSecondary">
@@ -232,7 +268,7 @@ export default function ClassContentPage() {
                   <LessonCard
                     key={lesson.id}
                     lesson={lesson}
-                    isLocked={!lesson.is_free && lesson.has_access === false}
+                    isLocked={!isAdmin && !lesson.is_free && lesson.has_access === false}
                   />
                 ))}
               </div>
@@ -328,12 +364,29 @@ export default function ClassContentPage() {
                     </div>
 
                     {/* Footer Action */}
-                    <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-surface-border/60 flex items-center justify-between text-xs font-bold text-cyanAccent">
-                      <span className="group-hover:text-primary transition-colors">ابدأ الوحدة</span>
-                      <div className="p-1.5 rounded-xl bg-cyan-50 group-hover:bg-primary group-hover:text-white group-hover:translate-x-[-4px] transition-all duration-300">
-                        <ArrowLeft className="w-3.5 h-3.5" />
+                    {!hasActiveSubscription ? (
+                      <div
+                        className="px-4 sm:px-5 pb-4 pt-3 border-t border-amber-100 flex items-center justify-between text-xs font-bold"
+                        onClick={(e) => e.preventDefault()}
+                      >
+                        <span className="text-amber-600">يتطلب اشتراكاً</span>
+                        <Link
+                          to="/subscription-plans"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold transition-colors shadow-sm"
+                        >
+                          <CreditCard className="w-3.5 h-3.5" />
+                          اشترك الآن
+                        </Link>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-surface-border/60 flex items-center justify-between text-xs font-bold text-cyanAccent">
+                        <span className="group-hover:text-primary transition-colors">ابدأ الوحدة</span>
+                        <div className="p-1.5 rounded-xl bg-cyan-50 group-hover:bg-primary group-hover:text-white group-hover:translate-x-[-4px] transition-all duration-300">
+                          <ArrowLeft className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                    )}
                   </Link>
                 );
               })}

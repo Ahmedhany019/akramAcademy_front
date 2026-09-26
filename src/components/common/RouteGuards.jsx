@@ -13,16 +13,12 @@ export function ProtectedRoute() {
   return <Outlet />;
 }
 
-// Students only — admin gets redirected to /admin
+// Student portal — accessible by authenticated users (students and admins previewing)
 export function StudentRoute() {
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
-  }
-
-  if (user?.role === "admin") {
-    return <Navigate to="/admin" replace />;
   }
 
   return <Outlet />;

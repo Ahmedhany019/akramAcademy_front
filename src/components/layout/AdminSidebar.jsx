@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   FolderKanban,
+  GraduationCap,
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
@@ -49,6 +50,7 @@ export default function AdminSidebar({ onItemClick }) {
     { to: "/admin/students", label: "الطلاب", icon: Users },
     { to: "/admin/subscriptions", label: "الاشتراكات", icon: CheckSquare },
     { to: "/admin/orders", label: "الطلبات", icon: ShoppingBag },
+    { to: "/student", label: "منصة الطلاب", icon: GraduationCap },
     // { to: "/admin/settings", label: "الإعدادات", icon: Settings },
   ];
 

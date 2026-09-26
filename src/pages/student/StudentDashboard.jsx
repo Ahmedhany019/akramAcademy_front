@@ -13,13 +13,17 @@ import {
   useGetLessonsQuery,
   useGetPlansQuery,
   useGetClassesQuery,
+  useGetMeQuery,
 } from "../../redux/api/apiSlice";
 import { heroImage } from "../../assets/images";
 import Button from "../../components/common/Button";
 import Skeleton from "../../components/common/Skeleton";
 
 export default function StudentDashboard() {
-  const user = useSelector((state) => state.auth.user);
+  const authUser = useSelector((state) => state.auth.user);
+  const { data: meData } = useGetMeQuery();
+  const user = meData?.data?.user || meData?.user || meData?.data || authUser || {};
+  const studentGradeId = user?.profile?.grade_level || user?.grade_level || user?.profile?.grade_level_id || user?.class_id;
 
   const { data: subsData, isLoading: loadingSubs } = useGetSubscriptionsQuery();
   const { data: lessonsData, isLoading: loadingLessons } = useGetLessonsQuery();
@@ -27,9 +31,29 @@ export default function StudentDashboard() {
   const { data: classesData, isLoading: loadingClasses } = useGetClassesQuery();
 
   const subscriptions = subsData?.data || subsData || [];
-  const lessons = lessonsData?.data || lessonsData || [];
-  const plans = plansData?.data || plansData || [];
-  const classes = classesData?.data || classesData || [];
+  const allLessons = lessonsData?.data || lessonsData || [];
+  const allPlans = plansData?.data || plansData || [];
+  const allClasses = classesData?.data || classesData || [];
+
+  const isStudentRestricted = user?.role !== "admin" && Boolean(studentGradeId);
+
+  const classes = Array.isArray(allClasses)
+    ? isStudentRestricted
+      ? allClasses.filter((cls) => String(cls.id) === String(studentGradeId))
+      : allClasses
+    : [];
+
+  const plans = Array.isArray(allPlans)
+    ? isStudentRestricted
+      ? allPlans.filter((p) => String(p.class?.id || p.class_id) === String(studentGradeId))
+      : allPlans
+    : [];
+
+  const lessons = Array.isArray(allLessons)
+    ? isStudentRestricted
+      ? allLessons.filter((l) => String(l.class_id || l.class?.id || l.unit?.class_id) === String(studentGradeId))
+      : allLessons
+    : [];
 
   const activeSubs = Array.isArray(subscriptions)
     ? subscriptions.filter((s) => s.status === "active").length

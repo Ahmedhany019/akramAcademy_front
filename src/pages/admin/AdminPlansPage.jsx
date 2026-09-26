@@ -67,7 +67,6 @@ export default function AdminPlansPage() {
     : [];
 
   const periodOptions = [
-    { value: "", label: "بدون فترة محددة" },
     ...availablePeriods.map((p) => {
       const typeLabel =
         p.type === "year" ? "سنة" : p.type === "term" ? "ترم" : "شهر";
@@ -268,6 +267,7 @@ export default function AdminPlansPage() {
               options={periodOptions}
               value={periodId}
               onChange={(e) => setPeriodId(e.target.value)}
+              required
             />
           </div>
 

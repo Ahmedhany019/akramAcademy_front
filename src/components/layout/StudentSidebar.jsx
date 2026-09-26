@@ -9,12 +9,13 @@ import {
   LogOut,
   ChevronRight,
   ChevronLeft,
+  ShieldAlert,
 } from "lucide-react";
 import ClassesDropdown from "./ClassesDropdown";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/slices/authSlice";
 import { toggleDesktopSidebar } from "../../redux/slices/uiSlice";
-import { useLogoutMutation } from "../../redux/api/apiSlice";
+import { useLogoutMutation, useGetMeQuery } from "../../redux/api/apiSlice";
 import { logo } from "../../assets/images";
 import { cn } from "../../utils/cn";
 
@@ -22,6 +23,9 @@ export default function StudentSidebar({ onItemClick }) {
   const dispatch = useDispatch();
   const [logoutApi] = useLogoutMutation();
   const collapsed = useSelector((state) => state.ui.desktopSidebarCollapsed);
+  const authUser = useSelector((state) => state.auth.user);
+  const { data: meData } = useGetMeQuery();
+  const user = meData?.data?.user || meData?.user || meData?.data || authUser || {};
 
   const handleLogout = async () => {
     try {
@@ -36,6 +40,9 @@ export default function StudentSidebar({ onItemClick }) {
 
   const navLinks = [
     { to: "/student", label: "الرئيسية", icon: Home },
+    ...(user?.role === "admin"
+      ? [{ to: "/admin", label: "لوحة الإدارة", icon: ShieldAlert }]
+      : []),
     { to: "/subscriptions", label: "الاشتراكات", icon: Layers },
     { to: "/subscription-plans", label: "خطط الاشتراك", icon: CreditCard },
     { to: "/orders", label: "الطلبات", icon: ShoppingBag },

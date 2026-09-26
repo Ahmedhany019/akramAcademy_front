@@ -5,6 +5,7 @@ import {
   useGetSubscriptionsQuery,
   useGetOrdersQuery,
   useCreateOrderMutation,
+  useGetMeQuery,
 } from "../../redux/api/apiSlice";
 import PageHeader from "../../components/common/PageHeader";
 import PlanCard from "../../components/subscriptions/PlanCard";
@@ -16,6 +17,10 @@ import { formatPrice } from "../../utils/cn";
 import { useNavigate } from "react-router-dom";
 
 export default function SubscriptionPlansPage() {
+  const { data: meData } = useGetMeQuery();
+  const user = meData?.data?.user || meData?.user || meData?.data || {};
+  const studentGradeId = user?.profile?.grade_level || user?.grade_level || user?.profile?.grade_level_id || user?.class_id;
+
   const { data: plansData, isLoading: isLoadingPlans } = useGetPlansQuery();
   const { data: classesData, isLoading: isLoadingClasses } = useGetClassesQuery();
   const { data: subsData } = useGetSubscriptionsQuery();
@@ -23,12 +28,24 @@ export default function SubscriptionPlansPage() {
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
 
   const plans = plansData?.data || plansData || [];
-  const classes = classesData?.data || classesData || [];
+  const allClasses = classesData?.data || classesData || [];
   const subscriptions = subsData?.data || subsData || [];
   const orders = ordersData?.data || ordersData || [];
   const navigate = useNavigate();
 
+  const isStudentRestricted = user?.role !== "admin" && Boolean(studentGradeId);
+
+  const classes = Array.isArray(allClasses)
+    ? isStudentRestricted
+      ? allClasses.filter((cls) => String(cls.id) === String(studentGradeId))
+      : allClasses
+    : [];
+
   const [selectedClassId, setSelectedClassId] = useState("all");
+
+  const effectiveClassFilter = isStudentRestricted
+    ? String(studentGradeId)
+    : selectedClassId;
 
   const classOptions = [
     { value: "all", label: "جميع الصفوف الدراسية" },
@@ -41,10 +58,10 @@ export default function SubscriptionPlansPage() {
   ];
 
   const filteredPlans = Array.isArray(plans)
-    ? selectedClassId === "all"
+    ? effectiveClassFilter === "all"
       ? plans
       : plans.filter(
-          (p) => String(p.class?.id || p.class_id) === String(selectedClassId)
+          (p) => String(p.class?.id || p.class_id) === String(effectiveClassFilter)
         )
     : [];
 
@@ -97,16 +114,18 @@ export default function SubscriptionPlansPage() {
         ]}
       />
 
-      {/* Class Filter Select */}
-      <div className="w-full sm:w-72">
-        <Select
-          label="تصفية حسب الصف الدراسي"
-          options={classOptions}
-          value={selectedClassId}
-          onChange={(e) => setSelectedClassId(e.target.value)}
-          placeholder="اختر الصف الدراسي..."
-        />
-      </div>
+      {/* Class Filter Select - only shown if not restricted to a single grade */}
+      {!isStudentRestricted && (
+        <div className="w-full sm:w-72">
+          <Select
+            label="تصفية حسب الصف الدراسي"
+            options={classOptions}
+            value={selectedClassId}
+            onChange={(e) => setSelectedClassId(e.target.value)}
+            placeholder="اختر الصف الدراسي..."
+          />
+        </div>
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
