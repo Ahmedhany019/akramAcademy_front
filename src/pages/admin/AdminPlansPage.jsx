@@ -3,6 +3,7 @@ import {
   useGetPlansQuery,
   useCreatePlanMutation,
   useUpdatePlanMutation,
+  useDeletePlanMutation,
   useGetClassesQuery,
   useGetPeriodsQuery,
 } from "../../redux/api/apiSlice";
@@ -13,7 +14,7 @@ import Modal from "../../components/common/Modal";
 import Input from "../../components/common/Input";
 import Select from "../../components/common/Select";
 import Badge from "../../components/common/Badge";
-import { Plus, Edit2 } from "lucide-react";
+import { Plus, Edit2, Trash2 } from "lucide-react";
 import { formatDate, formatPrice } from "../../utils/cn";
 
 export default function AdminPlansPage() {
@@ -27,6 +28,7 @@ export default function AdminPlansPage() {
 
   const [createPlan, { isLoading: isCreating }] = useCreatePlanMutation();
   const [updatePlan, { isLoading: isUpdating }] = useUpdatePlanMutation();
+  const [deletePlan, { isLoading: isDeleting }] = useDeletePlanMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
@@ -105,6 +107,16 @@ export default function AdminPlansPage() {
     setIsModalOpen(true);
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("هل أنت متأكد من حذف خطة الاشتراك هذه؟")) {
+      try {
+        await deletePlan(id).unwrap();
+      } catch (err) {
+        alert(err.data?.message || err.message || "حدث خطأ أثناء حذف الخطة");
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
@@ -174,21 +186,32 @@ export default function AdminPlansPage() {
         </Badge>
       ),
     },
-    // {
-    //   header: "الإجراءات",
-    //   accessor: "actions",
-    //   render: (row) => (
-    //     <Button
-    //       variant="outline"
-    //       size="sm"
-    //       onClick={() => handleOpenEdit(row)}
-    //       className="gap-1.5"
-    //     >
-    //       <Edit2 className="w-3.5 h-3.5" />
-    //       تعديل
-    //     </Button>
-    //   ),
-    // },
+    {
+      header: "الإجراءات",
+      accessor: "actions",
+      render: (row) => (
+        <div className="flex items-center gap-2">
+          <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleOpenEdit(row)}
+          className="gap-1.5"
+        >
+          <Edit2 className="w-3.5 h-3.5" />
+          تعديل
+        </Button>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => handleDelete(row.id)}
+            className="gap-1.5"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            حذف
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   return (

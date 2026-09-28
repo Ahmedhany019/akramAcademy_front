@@ -44,7 +44,7 @@ export default function Navbar({ title }) {
               : "⚙️ لوحة الإدارة"}
           </a>
         )}
-        <div className="flex items-center gap-2.5 bg-gray-50 border border-surface-border px-3 py-1.5 rounded-xl">
+        <div onClick={() => window.location.href = "/profile"} className="flex cursor-pointer items-center gap-2.5 bg-gray-50 border border-surface-border px-3 py-1.5 rounded-xl">
           <UserCircle className="w-6 h-6 text-primary" />
           <div className="text-right">
             <p className="text-xs font-bold text-primary leading-tight">

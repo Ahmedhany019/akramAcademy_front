@@ -12,7 +12,14 @@ import Skeleton from "../../components/common/Skeleton";
 import ErrorState from "../../components/common/ErrorState";
 import Button from "../../components/common/Button";
 import Badge from "../../components/common/Badge";
-import { Edit, BookOpen, Layers, Calendar, CheckCircle2, Clock } from "lucide-react";
+import {
+  Edit,
+  BookOpen,
+  Layers,
+  Calendar,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
 import { formatDate } from "../../utils/cn";
 
 export default function AdminLessonViewPage() {
@@ -31,9 +38,12 @@ export default function AdminLessonViewPage() {
     skip: !id,
   });
 
-  const { data: videoData, isLoading: loadingVideo } = useGetLessonVideoQuery(id, {
-    skip: !id,
-  });
+  const { data: videoData, isLoading: loadingVideo } = useGetLessonVideoQuery(
+    id,
+    {
+      skip: !id,
+    },
+  );
 
   const videoUrl =
     videoData?.data?.video_link ||
@@ -43,7 +53,9 @@ export default function AdminLessonViewPage() {
     lesson?.content?.video_link ||
     lesson?.video_url;
 
-  const apiOrigin = (import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1").replace(/\/api\/v1\/?$/, "");
+  const apiOrigin = (
+    import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1"
+  ).replace(/\/api\/v1\/?$/, "");
 
   const rawPdfUrl =
     pdfData?.data?.url ||
@@ -82,7 +94,7 @@ export default function AdminLessonViewPage() {
     <div className="space-y-6">
       <PageHeader
         title={lesson.title}
-        subtitle={lesson.unit?.name ? `الوحدة: ${lesson.unit.name}` : ""}
+        subtitle={lesson.unit?.name ? `القسم: ${lesson.unit.name}` : ""}
         breadcrumbs={[
           { label: "لوحة الإدارة", href: "/admin" },
           { label: "الدروس التعليمية", href: "/admin/lessons" },
@@ -119,8 +131,12 @@ export default function AdminLessonViewPage() {
             {lesson.is_free ? "محتوى مجاني" : "محتوى مدفوع"}
           </Badge>
 
-          <Badge variant={lesson.status === "published" ? "success" : "neutral"}>
-            {lesson.status === "published" ? "منشور للطلاب" : "مسودة (غير منشور)"}
+          <Badge
+            variant={lesson.status === "published" ? "success" : "neutral"}
+          >
+            {lesson.status === "published"
+              ? "منشور للطلاب"
+              : "مسودة (غير منشور)"}
           </Badge>
         </div>
 

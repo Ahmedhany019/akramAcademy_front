@@ -36,14 +36,16 @@ export default function LessonVideo({ videoUrl, title = "فيديو الدرس",
   const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}`;
 
   return (
-    <div className="w-full aspect-video rounded-2xl overflow-hidden shadow-card border border-surface-border bg-black">
+    <div className="w-full h-full relative aspect-video rounded-2xl overflow-hidden shadow-card border border-surface-border bg-black">
+      
+        <div className="absolute top-0 h-1/3 w-full inset-0"></div>
+        <div className="absolute top-[86%] h-1/3 w-full inset-0"></div>
       <iframe
         src={embedUrl}
         title={title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
         className="w-full h-full border-0"
-        
       />
     </div>
   );

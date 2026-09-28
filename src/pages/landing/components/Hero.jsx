@@ -1,9 +1,17 @@
 import React from "react";
 import { hero, teacher, lefrance } from "../../../assets/images";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { ArrowRight } from "lucide-react";
 
 const Hero = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const authTarget = isAuthenticated
+    ? user?.role === "admin"
+      ? "/admin"
+      : "/student"
+    : "/register";
+  const authLabel = isAuthenticated ? "الدخول للمنصة" : "سجل دخول";
   return (
     <main
       id="home"
@@ -41,10 +49,10 @@ const Hero = () => {
             
             <p className="md:text-4xl text-2xl w-full text-end">Professeur de français</p>
           <Link
-          to="/register"
+          to={authTarget}
           className="flex mr-auto w-fit items-center gap-2 rounded-full bg-[#1a45c4] px-6 py-3 text-lg font-bold text-white transition-all duration-300 hover:scale-105 hover:bg-[#20276d]"
           >
-          سجل دخول
+          {authLabel}
           <ArrowRight size={20} className="animate-bounce transition-all duration-500"/>
         </Link>
           </div>

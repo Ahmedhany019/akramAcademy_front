@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import { useGetStudentsQuery } from "../../redux/api/apiSlice";
+import { useGetStudentsQuery, useDeleteStudentMutation } from "../../redux/api/apiSlice";
 import PageHeader from "../../components/common/PageHeader";
 import Table from "../../components/tables/Table";
 import Button from "../../components/common/Button";
 import Badge from "../../components/common/Badge";
 import Input from "../../components/common/Input";
-import { Eye, Search, FileSpreadsheet } from "lucide-react";
+import { Eye, Search, FileSpreadsheet, Trash2 } from "lucide-react";
 
 export default function AdminStudentsPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const { data: studentsData, isLoading } = useGetStudentsQuery();
+  const [deleteStudent, { isLoading: isDeleting }] = useDeleteStudentMutation();
   const students = studentsData?.data || studentsData || [];
 
   useEffect(() => {
@@ -34,6 +35,16 @@ export default function AdminStudentsPage() {
     const parentPhoneMatch = student.parent_phone?.includes(term);
     return nameMatch || phoneMatch || parentPhoneMatch;
   });
+
+  const handleDelete = async (id) => {
+    if (window.confirm("هل أنت متأكد من حذف حساب هذا الطالب؟")) {
+      try {
+        await deleteStudent(id).unwrap();
+      } catch (err) {
+        alert(err.data?.message || err.message || "حدث خطأ أثناء حذف الطالب");
+      }
+    }
+  };
 
   const handleExportExcel = () => {
     const exportData = (filteredStudents.length > 0 ? filteredStudents : students).map(
@@ -101,15 +112,26 @@ export default function AdminStudentsPage() {
       header: "الإجراءات",
       accessor: "actions",
       render: (row) => (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(`/admin/students/${row.id}`)}
-          className="gap-1.5"
-        >
-          <Eye className="w-3.5 h-3.5" />
-          عرض الطالب
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/admin/students/${row.id}`)}
+            className="gap-1.5"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            عرض الطالب
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => handleDelete(row.id)}
+            className="gap-1.5"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            حذف
+          </Button>
+        </div>
       ),
     },
   ];

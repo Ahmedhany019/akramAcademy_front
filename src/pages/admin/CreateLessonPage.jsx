@@ -77,7 +77,7 @@ export default function CreateLessonPage() {
     setVideoError("");
 
     if (!title.trim() || !classId || !unitId) {
-      setErrorMsg("يرجى ملء الحقول الإلزامية (عنوان الدرس، الصف، الوحدة)");
+      setErrorMsg("يرجى ملء الحقول الإلزامية (عنوان الدرس، الصف، القسم)");
       return;
     }
 
@@ -237,11 +237,11 @@ export default function CreateLessonPage() {
               />
 
               <Select
-                label="الوحدة الدراسية"
+                label="القسم"
                 options={unitOptions}
                 value={unitId}
                 onChange={(e) => setUnitId(e.target.value)}
-                placeholder={classId ? "اختر الوحدة" : "اختر الصف أولاً"}
+                placeholder={classId ? "اختر القسم" : "اختر الصف أولاً"}
                 disabled={!classId}
                 required
               />

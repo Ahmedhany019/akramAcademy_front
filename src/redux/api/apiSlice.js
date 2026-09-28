@@ -49,6 +49,14 @@ export const apiSlice = createApi({
       }),
       providesTags: ["User"],
     }),
+    updateMe: builder.mutation({
+      query: (data) => ({
+        url: "/auth/me",
+        method: "PUT",
+        data,
+      }),
+      invalidatesTags: ["User"],
+    }),
 
     // CLASSES
     getClasses: builder.query({
@@ -99,6 +107,13 @@ export const apiSlice = createApi({
         url: `/units/${id}`,
         method: "PUT",
         data,
+      }),
+      invalidatesTags: ["Units", "Classes"],
+    }),
+    deleteUnit: builder.mutation({
+      query: (id) => ({
+        url: `/units/${id}`,
+        method: "DELETE",
       }),
       invalidatesTags: ["Units", "Classes"],
     }),
@@ -229,6 +244,14 @@ export const apiSlice = createApi({
       invalidatesTags: ["Periods"],
     }),
 
+    deletePeriod: builder.mutation({
+      query: (id) => ({
+        url: `/subscription-periods/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Periods"],
+    }),
+
     // PLANS
     getPlans: builder.query({
       query: (params) => ({
@@ -251,6 +274,13 @@ export const apiSlice = createApi({
         url: `/subscription-plans/${id}`,
         method: "PUT",
         data,
+      }),
+      invalidatesTags: ["Plans"],
+    }),
+    deletePlan: builder.mutation({
+      query: (id) => ({
+        url: `/subscription-plans/${id}`,
+        method: "DELETE",
       }),
       invalidatesTags: ["Plans"],
     }),
@@ -330,6 +360,13 @@ export const apiSlice = createApi({
         "Subscriptions",
       ],
     }),
+    deleteStudent: builder.mutation({
+      query: (id) => ({
+        url: `/students/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Students"],
+    }),
 
     // ANALYTICS
     getDashboard: builder.query({
@@ -347,12 +384,14 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useGetMeQuery,
+  useUpdateMeMutation,
   useGetClassesQuery,
   useGetClassUnitsQuery,
   useCreateClassMutation,
   useUpdateClassMutation,
   useCreateUnitMutation,
   useUpdateUnitMutation,
+  useDeleteUnitMutation,
   useGetLessonsQuery,
   useGetLessonQuery,
   useGetLessonPdfQuery,
@@ -367,9 +406,11 @@ export const {
   useGetPeriodsQuery,
   useCreatePeriodMutation,
   useUpdatePeriodMutation,
+  useDeletePeriodMutation,
   useGetPlansQuery,
   useCreatePlanMutation,
   useUpdatePlanMutation,
+  useDeletePlanMutation,
   useGetOrdersQuery,
   useGetOrderQuery,
   useCreateOrderMutation,
@@ -379,5 +420,6 @@ export const {
   useGetStudentsQuery,
   useGetStudentByIdQuery,
   useGetStudentOrdersAndSubscriptionsQuery,
+  useDeleteStudentMutation,
   useGetDashboardQuery,
 } = apiSlice;

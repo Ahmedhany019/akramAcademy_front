@@ -3,6 +3,7 @@ import {
   useGetClassesQuery,
   useCreateUnitMutation,
   useUpdateUnitMutation,
+  useDeleteUnitMutation,
   useGetClassUnitsQuery,
 } from "../../redux/api/apiSlice";
 import PageHeader from "../../components/common/PageHeader";
@@ -12,10 +13,12 @@ import Modal from "../../components/common/Modal";
 import Input from "../../components/common/Input";
 import Textarea from "../../components/common/Textarea";
 import Select from "../../components/common/Select";
-import { Plus, Edit2, Image as ImageIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import Badge from "../../components/common/Badge";
+import { Plus, Edit2, Trash2, Image as ImageIcon, BookOpen, Lock, PlayCircle, Eye } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function AdminUnitsPage() {
+  const navigate = useNavigate();
   const [selectedClassId, setSelectedClassId] = useState("");
 
   const { data: classesData } = useGetClassesQuery();
@@ -33,8 +36,10 @@ export default function AdminUnitsPage() {
 
   const [createUnit, { isLoading: isCreating }] = useCreateUnitMutation();
   const [updateUnit, { isLoading: isUpdating }] = useUpdateUnitMutation();
+  const [deleteUnit, { isLoading: isDeleting }] = useDeleteUnitMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewingUnit, setViewingUnit] = useState(null);
   const [editingUnit, setEditingUnit] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -69,11 +74,21 @@ export default function AdminUnitsPage() {
     setIsModalOpen(true);
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("هل أنت متأكد من حذف هذا القسم؟ سيتم حذف جميع الدروس التابعة له.")) {
+      try {
+        await deleteUnit(id).unwrap();
+      } catch (err) {
+        alert(err.data?.message || err.message || "حدث خطأ أثناء حذف القسم");
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
     if (!name.trim()) {
-      setErrorMsg("يرجى إدخال اسم الوحدة");
+      setErrorMsg("يرجى إدخال اسم القسم");
       return;
     }
 
@@ -99,7 +114,7 @@ export default function AdminUnitsPage() {
       setIsModalOpen(false);
     } catch (err) {
       setErrorMsg(
-        err.data?.message || err.message || "حدث خطأ أثناء حفظ بيانات الوحدة",
+        err.data?.message || err.message || "حدث خطأ أثناء حفظ بيانات القسم",
       );
     }
   };
@@ -110,7 +125,7 @@ export default function AdminUnitsPage() {
   const BASE_URL = import.meta.env.VITE_API_URL.replace("/api/v1", "");
   const columns = [
     {
-      header: "صورة الوحدة",
+      header: "صورة القسم",
       accessor: "thumbnail",
       render: (row) =>
         row.thumbnail ? (
@@ -130,10 +145,19 @@ export default function AdminUnitsPage() {
         ),
     },
     {
-      header: "اسم الوحدة",
+      header: "اسم القسم",
       accessor: "name",
       render: (row) => (
-        <span className="font-bold text-primary">{row.name}</span>
+        <button
+          type="button"
+          onClick={() => setViewingUnit(row)}
+          className="font-bold text-primary hover:text-cyanAccent hover:underline text-right flex items-center gap-1.5 transition-colors cursor-pointer"
+        >
+          <span>{row.name}</span>
+          <span className="text-[11px] font-normal text-textSecondary bg-gray-100 px-2 py-0.5 rounded-full">
+            {row.lessons?.length || 0} درس
+          </span>
+        </button>
       ),
     },
     {
@@ -145,15 +169,36 @@ export default function AdminUnitsPage() {
       header: "الإجراءات",
       accessor: "actions",
       render: (row) => (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleOpenEdit(row)}
-          className="gap-1.5"
-        >
-          <Edit2 className="w-3.5 h-3.5" />
-          تعديل
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setViewingUnit(row)}
+            className="gap-1.5"
+            title="عرض الدروس"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            الدروس
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleOpenEdit(row)}
+            className="gap-1.5"
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+            تعديل
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => handleDelete(row.id)}
+            className="gap-1.5"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            حذف
+          </Button>
+        </div>
       ),
     },
   ];
@@ -212,7 +257,7 @@ export default function AdminUnitsPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingUnit ? "تعديل بيانات الوحدة" : "إضافة وحدة دراسية جديدة"}
+        title={editingUnit ? "تعديل بيانات القسم" : "إضافة وحدة دراسية جديدة"}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {errorMsg && (
@@ -230,8 +275,8 @@ export default function AdminUnitsPage() {
           />
 
           <Input
-            label="اسم الوحدة"
-            placeholder="مثال: الوحدة الأولى - مدخل المنهج"
+            label="اسم القسم"
+            placeholder="مثال: القسم الأولى - مدخل المنهج"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -239,7 +284,7 @@ export default function AdminUnitsPage() {
 
           <div className="space-y-1.5">
             <label className="block text-xs font-bold text-primary">
-              صورة غلاف الوحدة (Thumbnail)
+              صورة غلاف القسم (Thumbnail)
             </label>
             <input
               type="file"
@@ -270,8 +315,8 @@ export default function AdminUnitsPage() {
           </div>
 
           <Textarea
-            label="وصف الوحدة"
-            placeholder="وصف مختصر لمحتوى الوحدة..."
+            label="وصف القسم"
+            placeholder="وصف مختصر لمحتوى القسم..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
@@ -294,6 +339,96 @@ export default function AdminUnitsPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* View Unit Lessons Modal */}
+      <Modal
+        isOpen={!!viewingUnit}
+        onClose={() => setViewingUnit(null)}
+        title={`دروس ${viewingUnit?.name || "القسم"}`}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-surface-border">
+            <span className="text-xs font-semibold text-textSecondary">
+              إجمالي الدروس: {viewingUnit?.lessons?.length || 0}
+            </span>
+            <Link to="/admin/lessons/create">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setViewingUnit(null)}
+                className="gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                إضافة درس جديد
+              </Button>
+            </Link>
+          </div>
+
+          {viewingUnit?.lessons && viewingUnit.lessons.length > 0 ? (
+            <div className="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
+              {viewingUnit.lessons.map((lesson, idx) => (
+                <div
+                  key={lesson.id}
+                  className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-surface-border hover:bg-gray-100/70 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+                      {idx + 1}
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold text-primary">{lesson.title}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge
+                          variant={lesson.is_free ? "success" : "neutral"}
+                          className="text-[10px] px-1.5 py-0.2"
+                        >
+                          {lesson.is_free ? "مجاني" : "مدفوع"}
+                        </Badge>
+                        <Badge
+                          variant={lesson.status === "published" ? "cyan" : "neutral"}
+                          className="text-[10px] px-1.5 py-0.2"
+                        >
+                          {lesson.status === "published" ? "منشور" : "مسودة"}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigate(`/admin/lessons/${lesson.id}`)}
+                      title="عرض الدرس"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-gray-500" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigate(`/admin/lessons/${lesson.id}/edit`)}
+                      title="تعديل الدرس"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-cyanAccent" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center bg-gray-50 border border-surface-border rounded-xl text-textSecondary text-xs">
+              <BookOpen className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+              لا توجد دروس مضافة لهذه القسم حتى الآن
+            </div>
+          )}
+
+          <div className="flex justify-end pt-3 border-t border-surface-border">
+            <Button variant="outline" onClick={() => setViewingUnit(null)}>
+              إغلاق
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

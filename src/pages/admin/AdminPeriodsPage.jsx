@@ -3,6 +3,7 @@ import {
   useGetPeriodsQuery,
   useCreatePeriodMutation,
   useUpdatePeriodMutation,
+  useDeletePeriodMutation,
   useGetClassesQuery,
 } from "../../redux/api/apiSlice";
 import PageHeader from "../../components/common/PageHeader";
@@ -12,7 +13,7 @@ import Input from "../../components/common/Input";
 import Select from "../../components/common/Select";
 import Badge from "../../components/common/Badge";
 import Skeleton from "../../components/common/Skeleton";
-import { Plus, Calendar, Edit2, ChevronDown, ChevronLeft } from "lucide-react";
+import { Plus, Calendar, Edit2, Trash2, ChevronDown, ChevronLeft } from "lucide-react";
 import { formatDate } from "../../utils/cn";
 
 export default function AdminPeriodsPage() {
@@ -24,6 +25,7 @@ export default function AdminPeriodsPage() {
 
   const [createPeriod, { isLoading: isCreating }] = useCreatePeriodMutation();
   const [updatePeriod, { isLoading: isUpdating }] = useUpdatePeriodMutation();
+  const [deletePeriod, { isLoading: isDeleting }] = useDeletePeriodMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPeriod, setEditingPeriod] = useState(null);
@@ -76,6 +78,16 @@ export default function AdminPeriodsPage() {
     setEndDate(p.end_date ? p.end_date.split("T")[0] : "");
     setErrorMsg("");
     setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("هل أنت متأكد من حذف الفترة الدراسية؟ قد يؤثر ذلك على الاشتراكات المرتبطة بها.")) {
+      try {
+        await deletePeriod(id).unwrap();
+      } catch (err) {
+        alert(err.data?.message || err.message || "حدث خطأ أثناء حذف الفترة الدراسية");
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -160,15 +172,26 @@ export default function AdminPeriodsPage() {
             </div>
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleOpenEdit(node)}
-            className="gap-1.5"
-          >
-            <Edit2 className="w-3.5 h-3.5" />
-            تعديل
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleOpenEdit(node)}
+              className="gap-1.5"
+            >
+              <Edit2 className="w-3.5 h-3.5" />
+              تعديل
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => handleDelete(node.id)}
+              className="gap-1.5"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              حذف
+            </Button>
+          </div>
         </div>
 
         {children.length > 0 && (
@@ -273,7 +296,7 @@ export default function AdminPeriodsPage() {
             <Input
               label="تاريخ البداية"
               type="date"
-              value={startDate || new Date().toISOString().split("T")[0]}
+              value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
             <Input

@@ -1,10 +1,19 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Phone, Facebook, Youtube, Menu, X, ArrowRight } from "lucide-react";
+import { useSelector } from "react-redux";
+import { Phone, Facebook, Youtube, Menu, X, ArrowRight, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+
+  const authTarget = isAuthenticated
+    ? user?.role === "admin"
+      ? "/admin"
+      : "/student"
+    : "/register";
+  const authLabel = isAuthenticated ? "الدخول للمنصة" : "سجل دخول";
 
   const navLinks = [
     { name: "الرئيسية", path: "" },
@@ -61,10 +70,10 @@ const Header = () => {
         {/* Right Actions */}
         <div className="hidden lg:flex items-center gap-3">
           <Link
-            to="/register"
+            to={authTarget}
             className="flex items-center gap-2 rounded-full bg-[#f1c40f] px-6 py-3 text-sm font-bold text-[#0f1d41] transition-all duration-300 hover:scale-105 hover:bg-[#dcb20c]"
           >
-            سجل دخول
+            {authLabel}
             <ArrowRight size={17} />
           </Link>
 
@@ -112,10 +121,11 @@ const Header = () => {
           ))}
 
           <Link
-            to="/register"
+            to={authTarget}
+            onClick={() => setOpen(false)}
             className="w-fit mx-auto flex mt-4 items-center gap-2 rounded-full bg-[#f1c40f] px-6 py-3 text-sm font-bold text-[#0f1d41] transition-all duration-300 hover:scale-105 hover:bg-[#dcb20c]"
           >
-            سجل دخول
+            {authLabel}
             <ArrowRight size={17} />
           </Link>
 

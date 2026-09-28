@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   GraduationCap,
   BookOpen,
@@ -9,10 +10,23 @@ import {
   Lock,
   PlayCircle,
 } from "lucide-react";
-import { useGetClassesQuery, useGetClassUnitsQuery } from "../../../redux/api/apiSlice";
+import {
+  useGetClassesQuery,
+  useGetClassUnitsQuery,
+} from "../../../redux/api/apiSlice";
 import Button from "../../../components/common/Button";
 
 const PricingOffers = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+
+  const authTarget = isAuthenticated
+    ? user?.role === "admin"
+      ? "/admin"
+      : "/student"
+    : "/register";
+  const authLabel = isAuthenticated ? "الدخول للمنصة" : "تسجيل الدخول";
+
   const { data: classesData, isLoading: loadingClasses } = useGetClassesQuery();
   const classes = classesData?.data || classesData || [];
 
@@ -26,7 +40,7 @@ const PricingOffers = () => {
 
   const { data: unitsData, isLoading: loadingUnits } = useGetClassUnitsQuery(
     selectedClassId,
-    { skip: !selectedClassId }
+    { skip: !selectedClassId },
   );
 
   const units = unitsData?.data?.units || unitsData?.units || [];
@@ -39,34 +53,53 @@ const PricingOffers = () => {
     : "http://localhost:8000";
 
   return (
-    <section id="courses" dir="rtl" className="w-full bg-[#f8fafc] py-20 px-4 md:px-8 border-t border-slate-200/60 scroll-mt-[90px]">
+    <section
+      id="courses"
+      dir="rtl"
+      className="w-full bg-[#f8fafc] py-20 px-4 md:px-8 border-t border-slate-200/60 scroll-mt-[90px]"
+    >
       <div className="max-w-[1250px] mx-auto">
         {/* Login And Register */}
         <div className="flex justify-center mb-6">
           <div className="flex gap-2">
-            <Link to="/login">
-              <Button variant="primary" onClick={() => navigate("/login")}>
-                تسجيل الدخول
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button variant="outline" onClick={() => navigate("/register")}>
-                إنشاء حساب
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link to={authTarget}>
+                <Button variant="primary" onClick={() => navigate(authTarget)}>
+                  {authLabel}
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="primary" onClick={() => navigate("/login")}>
+                    تسجيل الدخول
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate("/register")}
+                  >
+                    إنشاء حساب
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
         {/* Section Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-[#0f1d41]/10 text-[#0f1d41] px-4 py-1.5 rounded-full text-xs font-black mb-3">
             <Sparkles className="w-4 h-4 text-[#f1c40f]" />
-            <span>المناهج والوحدات الدراسية</span>
+            <span>المناهج والاقسام الدراسية</span>
           </div>
           <h2 className="text-3xl md:text-5xl font-extrabold text-[#0f1d41] leading-tight">
-            استكشف <span className="text-[#1a45c4]">الوحدات والدروس</span> المتاحة
+            استكشف <span className="text-[#1a45c4]">الاقسام والدروس</span>{" "}
+            المتاحة
           </h2>
           <p className="text-sm md:text-base text-gray-500 mt-3 max-w-xl mx-auto font-medium">
-            تصفح المحتوى التعليمي لكل صف دراسي مع تفاصيل الوحدات والدروس لشرح وتبسيط مادة اللغة الفرنسية
+            تصفح المحتوى التعليمي لكل صف دراسي مع تفاصيل الاقسامات والدروس لشرح
+            وتبسيط مادة اللغة الفرنسية
           </p>
         </div>
 
@@ -74,13 +107,16 @@ const PricingOffers = () => {
         {loadingClasses ? (
           <div className="flex justify-center gap-3 mb-12">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-12 w-44 bg-gray-200 rounded-2xl animate-pulse" />
+              <div
+                key={i}
+                className="h-12 w-44 bg-gray-200 rounded-2xl animate-pulse"
+              />
             ))}
           </div>
         ) : (
           <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-14">
             {Array.isArray(classes) &&
-              classes.slice(0,8).map((cls) => {
+              classes.slice(0, 8).map((cls) => {
                 const isActive = String(selectedClassId) === String(cls.id);
                 return (
                   <button
@@ -107,7 +143,10 @@ const PricingOffers = () => {
         {loadingUnits ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-64 bg-gray-200 rounded-3xl animate-pulse" />
+              <div
+                key={i}
+                className="h-64 bg-gray-200 rounded-3xl animate-pulse"
+              />
             ))}
           </div>
         ) : units && units.length > 0 ? (
@@ -136,7 +175,7 @@ const PricingOffers = () => {
                     {/* Unit Header Badge */}
                     <div className="flex items-center justify-between gap-3 mb-4">
                       <span className="text-xs font-black px-3.5 py-1 rounded-full bg-[#1a45c4]/10 text-[#1a45c4]">
-                        الوحدة {index + 1}
+                        القسم {index + 1}
                       </span>
                       <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 bg-slate-100 px-2.5 py-1 rounded-lg">
                         <BookOpen className="w-3.5 h-3.5 text-[#1a45c4]" />
@@ -154,7 +193,9 @@ const PricingOffers = () => {
 
                     {/* Lessons List Preview */}
                     <div className="space-y-2.5">
-                      <p className="text-xs font-bold text-gray-400 mb-2">الدروس والمحاضرات:</p>
+                      <p className="text-xs font-bold text-gray-400 mb-2">
+                        الدروس والمحاضرات:
+                      </p>
                       {lessons.length > 0 ? (
                         lessons.slice(0, 4).map((lesson) => (
                           <div
@@ -176,13 +217,13 @@ const PricingOffers = () => {
                         ))
                       ) : (
                         <p className="text-xs text-gray-400 py-3 text-center">
-                          جاري إضافة دروس هذه الوحدة قريباً
+                          جاري إضافة دروس هذه القسم قريباً
                         </p>
                       )}
 
                       {lessons.length > 4 && (
                         <p className="text-[11px] font-bold text-[#1a45c4] text-center pt-1">
-                          + {lessons.length - 4} دروس إضافية في هذه الوحدة
+                          + {lessons.length - 4} دروس إضافية في هذه القسم
                         </p>
                       )}
                     </div>
@@ -191,10 +232,10 @@ const PricingOffers = () => {
                   {/* Card Bottom CTA */}
                   <div className="p-6 pt-0">
                     <Link
-                      to="/register"
+                      to={authTarget}
                       className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#0f1d41] text-white text-xs md:text-sm font-bold hover:bg-[#1a45c4] transition-all duration-300 shadow-md group-hover:shadow-lg"
                     >
-                      <span>تصفح محتوى الوحدة كاملاً</span>
+                      <span>تصفح محتوى القسم كاملاً</span>
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>

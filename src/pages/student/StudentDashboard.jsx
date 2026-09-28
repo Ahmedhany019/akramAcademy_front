@@ -22,8 +22,13 @@ import Skeleton from "../../components/common/Skeleton";
 export default function StudentDashboard() {
   const authUser = useSelector((state) => state.auth.user);
   const { data: meData } = useGetMeQuery();
-  const user = meData?.data?.user || meData?.user || meData?.data || authUser || {};
-  const studentGradeId = user?.profile?.grade_level || user?.grade_level || user?.profile?.grade_level_id || user?.class_id;
+  const user =
+    meData?.data?.user || meData?.user || meData?.data || authUser || {};
+  const studentGradeId =
+    user?.profile?.grade_level ||
+    user?.grade_level ||
+    user?.profile?.grade_level_id ||
+    user?.class_id;
 
   const { data: subsData, isLoading: loadingSubs } = useGetSubscriptionsQuery();
   const { data: lessonsData, isLoading: loadingLessons } = useGetLessonsQuery();
@@ -45,13 +50,19 @@ export default function StudentDashboard() {
 
   const plans = Array.isArray(allPlans)
     ? isStudentRestricted
-      ? allPlans.filter((p) => String(p.class?.id || p.class_id) === String(studentGradeId))
+      ? allPlans.filter(
+          (p) => String(p.class?.id || p.class_id) === String(studentGradeId),
+        )
       : allPlans
     : [];
 
   const lessons = Array.isArray(allLessons)
     ? isStudentRestricted
-      ? allLessons.filter((l) => String(l.class_id || l.class?.id || l.unit?.class_id) === String(studentGradeId))
+      ? allLessons.filter(
+          (l) =>
+            String(l.class_id || l.class?.id || l.unit?.class_id) ===
+            String(studentGradeId),
+        )
       : allLessons
     : [];
 
@@ -73,7 +84,8 @@ export default function StudentDashboard() {
               أهلاً يا {user?.name ? user.name.split(" ")[0] : "طالب"} 👋
             </h1>
             <p className="text-gray-300 text-sm leading-relaxed">
-              استمر في التعلم، كل خطوة تقربك من هدفك. تابع جدول دروسك ومذكراتك بانتظام لتحقيق أعلى النتائج.
+              استمر في التعلم، كل خطوة تقربك من هدفك. تابع جدول دروسك ومذكراتك
+              بانتظام لتحقيق أعلى النتائج.
             </p>
             <div className="pt-2">
               <Link to="/subscription-plans">
@@ -186,8 +198,8 @@ export default function StudentDashboard() {
                     {cls.name}
                   </h3>
                   <p className="text-xs text-textSecondary mt-1">
-                    تصفح الوحدات والدروس المتاحة
-                  </p>
+                    تصفح الاقسام والدروس المتاحة
+                  </p>  
                 </div>
                 <div className="p-2.5 rounded-xl bg-gray-50 text-gray-400 group-hover:bg-cyan-50 group-hover:text-cyanAccent transition-colors">
                   <ArrowLeft className="w-5 h-5" />

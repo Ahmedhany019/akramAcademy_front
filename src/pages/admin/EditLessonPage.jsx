@@ -296,7 +296,7 @@ export default function EditLessonPage() {
               />
 
               <Select
-                label="الوحدة الدراسية"
+                label="القسم"
                 options={unitOptions}
                 value={unitId}
                 onChange={(e) => setUnitId(e.target.value)}

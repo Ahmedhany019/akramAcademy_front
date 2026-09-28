@@ -42,7 +42,7 @@ export default function AdminSidebar({ onItemClick }) {
 
   const navLinks = [
     { to: "/admin", label: "الرئيسية", icon: LayoutDashboard, end: true },
-    { to: "/admin/classes", label: "إدارة الفصول", icon: FolderKanban },
+    // { to: "/admin/classes", label: "إدارة الفصول", icon: FolderKanban },
     { to: "/admin/units", label: "الأقسام", icon: Layers },
     { to: "/admin/lessons", label: "الدروس", icon: BookOpen },
     { to: "/admin/periods", label: "الفترات الدراسية", icon: Calendar },

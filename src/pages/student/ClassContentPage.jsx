@@ -34,24 +34,24 @@ export default function ClassContentPage() {
 
   const { data: subsData } = useGetSubscriptionsQuery();
   const subscriptions = subsData?.data || subsData || [];
-  const hasActiveSubscription = isAdmin || (Array.isArray(subscriptions)
-    ? subscriptions.some(
-        (s) =>
-          s.status === "active" &&
-          (
-            String(s.plan?.class_id || s.plan?.class?.id) === String(effectiveClassId) ||
-            String(s.class_id) === String(effectiveClassId)
-          )
-      )
-    : false);
+  const hasActiveSubscription =
+    isAdmin ||
+    (Array.isArray(subscriptions)
+      ? subscriptions.some(
+          (s) =>
+            s.status === "active" &&
+            (String(s.plan?.class_id || s.plan?.class?.id) ===
+              String(effectiveClassId) ||
+              String(s.class_id) === String(effectiveClassId)),
+        )
+      : false);
 
   const { data: unitsData, isLoading: loadingUnits } = useGetClassUnitsQuery(
     effectiveClassId,
     { skip: !effectiveClassId },
   );
-  const { data: periodsData, isLoading: loadingPeriods } =
-    useGetPeriodsQuery();
-    // { skip: !effectiveClassId }
+  const { data: periodsData, isLoading: loadingPeriods } = useGetPeriodsQuery();
+  // { skip: !effectiveClassId }
 
   const units = unitsData?.data?.units || unitsData?.data || unitsData || [];
   const allPeriods = periodsData?.data || periodsData || [];
@@ -59,7 +59,7 @@ export default function ClassContentPage() {
   const periods = Array.isArray(allPeriods)
     ? effectiveClassId
       ? allPeriods.filter(
-          (p) => String(p.class_id || p.class?.id) === String(effectiveClassId)
+          (p) => String(p.class_id || p.class?.id) === String(effectiveClassId),
         )
       : allPeriods
     : [];
@@ -89,8 +89,8 @@ export default function ClassContentPage() {
         subtitle={
           selectedUnit
             ? selectedUnit.description ||
-              "قائمة الدروس والمحتوى التعليمي التابع لهذه الوحدة"
-            : "تصفح الوحدات والدروس المتاحة لهذا الصف الدراسي"
+              "قائمة الدروس والمحتوى التعليمي التابع لهذه القسم"
+            : "تصفح الاقسام والدروس المتاحة لهذا الصف الدراسي"
         }
         breadcrumbs={
           selectedUnit
@@ -255,8 +255,8 @@ export default function ClassContentPage() {
                   title="لا توجد دروس متوفرة"
                   description={
                     selectedPeriodId
-                      ? "لا توجد دروس في هذه الوحدة للفترة المختارة."
-                      : "لم يتم إضافة دروس لهذه الوحدة بعد."
+                      ? "لا توجد دروس في هذه القسم للفترة المختارة."
+                      : "لم يتم إضافة دروس لهذه القسم بعد."
                   }
                 />
               );
@@ -268,7 +268,9 @@ export default function ClassContentPage() {
                   <LessonCard
                     key={lesson.id}
                     lesson={lesson}
-                    isLocked={!isAdmin && !lesson.is_free && lesson.has_access === false}
+                    isLocked={
+                      !isAdmin && !lesson.is_free && lesson.has_access === false
+                    }
                   />
                 ))}
               </div>
@@ -281,10 +283,10 @@ export default function ClassContentPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-primary flex items-center gap-2">
               <Layers className="w-5 h-5 text-cyanAccent" />
-              الوحدات الدراسية
+              الاقسام الدراسية
             </h2>
             <span className="text-xs text-textSecondary">
-              اضغط على الوحدة لعرض دروسها
+              اضغط على القسم لعرض دروسها
             </span>
           </div>
 
@@ -322,7 +324,9 @@ export default function ClassContentPage() {
                         ) : (
                           <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-white/40">
                             <Layers className="w-12 h-12 text-cyanAccent/60 group-hover:scale-110 transition-transform duration-300" />
-                            <span className="text-xs font-semibold text-white/60">الوحدة {index + 1}</span>
+                            <span className="text-xs font-semibold text-white/60">
+                              القسم {index + 1}
+                            </span>
                           </div>
                         )}
 
@@ -332,7 +336,7 @@ export default function ClassContentPage() {
                         {/* Unit Index Badge (Top Right) */}
                         <div className="absolute top-3 right-3 z-10">
                           <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md text-white text-[11px] font-black border border-white/10 shadow-sm">
-                            الوحدة {index + 1}
+                            القسم {index + 1}
                           </span>
                         </div>
 
@@ -357,7 +361,7 @@ export default function ClassContentPage() {
                           </p>
                         ) : (
                           <p className="text-xs text-textSecondary/60 mt-2 italic">
-                            انقر لاستكشاف دروس وتمارين هذه الوحدة
+                            انقر لاستكشاف دروس وتمارين هذه القسم
                           </p>
                         )}
                       </div>
@@ -381,7 +385,9 @@ export default function ClassContentPage() {
                       </div>
                     ) : (
                       <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-surface-border/60 flex items-center justify-between text-xs font-bold text-cyanAccent">
-                        <span className="group-hover:text-primary transition-colors">ابدأ الوحدة</span>
+                        <span className="group-hover:text-primary transition-colors">
+                          ابدأ القسم
+                        </span>
                         <div className="p-1.5 rounded-xl bg-cyan-50 group-hover:bg-primary group-hover:text-white group-hover:translate-x-[-4px] transition-all duration-300">
                           <ArrowLeft className="w-3.5 h-3.5" />
                         </div>

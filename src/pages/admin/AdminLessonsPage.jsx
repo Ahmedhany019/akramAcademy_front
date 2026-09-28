@@ -18,7 +18,15 @@ import ConfirmModal from "../../components/common/ConfirmModal";
 import Modal from "../../components/common/Modal";
 import Input from "../../components/common/Input";
 import Select from "../../components/common/Select";
-import { Plus, Eye, Edit, Trash2, CheckCircle, XCircle, Calendar } from "lucide-react";
+import {
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  Calendar,
+} from "lucide-react";
 import { formatDate } from "../../utils/cn";
 
 export default function AdminLessonsPage() {
@@ -27,7 +35,8 @@ export default function AdminLessonsPage() {
   const { data: lessonsData, isLoading } = useGetLessonsQuery();
   const { data: classesData } = useGetClassesQuery();
   const { data: periodsData } = useGetPeriodsQuery();
-  const [createPeriod, { isLoading: isCreatingPeriod }] = useCreatePeriodMutation();
+  const [createPeriod, { isLoading: isCreatingPeriod }] =
+    useCreatePeriodMutation();
   const [deleteLesson, { isLoading: isDeleting }] = useDeleteLessonMutation();
   const [publishLesson] = usePublishLessonMutation();
   const [unpublishLesson] = useUnpublishLessonMutation();
@@ -88,9 +97,7 @@ export default function AdminLessonsPage() {
   const filteredLessons = lessons.filter((lesson) => {
     if (selectedClassId) {
       const lessonClassId =
-        lesson.class_id ??
-        lesson.unit?.class_id ??
-        lesson.unit?.classId;
+        lesson.class_id ?? lesson.unit?.class_id ?? lesson.unit?.classId;
       if (String(lessonClassId) !== String(selectedClassId)) {
         return false;
       }
@@ -102,11 +109,17 @@ export default function AdminLessonsPage() {
       const lessonDate = new Date(dateStr);
       if (isNaN(lessonDate.getTime())) return false;
 
-      if (selectedMonth && String(lessonDate.getMonth() + 1) !== String(selectedMonth)) {
+      if (
+        selectedMonth &&
+        String(lessonDate.getMonth() + 1) !== String(selectedMonth)
+      ) {
         return false;
       }
 
-      if (selectedYear && String(lessonDate.getFullYear()) !== String(selectedYear)) {
+      if (
+        selectedYear &&
+        String(lessonDate.getFullYear()) !== String(selectedYear)
+      ) {
         return false;
       }
     }
@@ -154,7 +167,7 @@ export default function AdminLessonsPage() {
       setIsPeriodModalOpen(false);
     } catch (err) {
       setPeriodErrorMsg(
-        err.data?.message || err.message || "حدث خطأ أثناء حفظ الفترة الدراسية"
+        err.data?.message || err.message || "حدث خطأ أثناء حفظ الفترة الدراسية",
       );
     }
   };
@@ -187,24 +200,34 @@ export default function AdminLessonsPage() {
     {
       header: "عنوان الدرس",
       accessor: "title",
-      render: (row) => <span className="font-bold text-primary">{row.title}</span>,
+      render: (row) => (
+        <span className="font-bold text-primary">{row.title}</span>
+      ),
     },
     {
-      header: "الوحدة",
+      header: "القسم",
       accessor: "unit",
       render: (row) => row.unit?.name || "-",
     },
     {
       header: "الفترة",
       accessor: "period",
-      render: (row) => row.period?.type === "month"? "شهر": row.period?.type === "term"? "ترم": "سنة"  || "-",
+      render: (row) =>
+        row.period?.type === "month"
+          ? "شهر"
+          : row.period?.type === "term"
+            ? "ترم"
+            : "سنة" || "-",
     },
     {
       header: "النوع",
       accessor: "is_free",
       render: (row) =>
         row.is_free ? (
-          <Badge variant="success" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+          <Badge
+            variant="success"
+            className="bg-emerald-50 text-emerald-700 border-emerald-200"
+          >
             مجاني
           </Badge>
         ) : (

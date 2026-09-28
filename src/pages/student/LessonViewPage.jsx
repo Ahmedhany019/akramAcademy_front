@@ -71,9 +71,9 @@ export default function LessonViewPage() {
       : `${apiOrigin}${rawPdfUrl}`
     : null;
 
-    console.log("PDF DATA:", pdfData);
-console.log("RAW PDF URL:", rawPdfUrl);
-console.log("FINAL PDF URL:", pdfUrl);
+  console.log("PDF DATA:", pdfData);
+  console.log("RAW PDF URL:", rawPdfUrl);
+  console.log("FINAL PDF URL:", pdfUrl);
 
   if (loadingLesson) {
     return (
@@ -99,7 +99,7 @@ console.log("FINAL PDF URL:", pdfUrl);
     <div className="space-y-6">
       <PageHeader
         title={lesson.title}
-        subtitle={lesson.unit?.name ? `الوحدة: ${lesson.unit.name}` : ""}
+        subtitle={lesson.unit?.name ? `القسم: ${lesson.unit.name}` : ""}
         breadcrumbs={[
           { label: "الرئيسية", href: "/" },
           {
