@@ -16,6 +16,8 @@ export const apiSlice = createApi({
     "Orders",
     "Students",
     "Analytics",
+    "Comments",
+    "Notifications",
   ],
   endpoints: (builder) => ({
     // AUTH
@@ -376,6 +378,91 @@ export const apiSlice = createApi({
       }),
       providesTags: ["Analytics"],
     }),
+
+    // COMMENTS & REPLIES
+    getLessonComments: builder.query({
+      query: (lessonId) => ({
+        url: "/comments/lesson-comments",
+        method: "GET",
+        params: { lessonId },
+      }),
+      providesTags: (result, error, lessonId) => [
+        { type: "Comments", id: lessonId },
+        "Comments",
+      ],
+    }),
+    createComment: builder.mutation({
+      query: (data) => ({
+        url: "/comments",
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: (result, error, { lessonId }) => [
+        { type: "Comments", id: lessonId },
+        "Comments",
+      ],
+    }),
+    deleteComment: builder.mutation({
+      query: ({ id, lessonId }) => ({
+        url: `/comments/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, { lessonId }) => [
+        { type: "Comments", id: lessonId },
+        "Comments",
+      ],
+    }),
+    createReply: builder.mutation({
+      query: (data) => ({
+        url: "/comments/reply",
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: (result, error, { lessonId }) => [
+        { type: "Comments", id: lessonId },
+        "Comments",
+      ],
+    }),
+    deleteReply: builder.mutation({
+      query: ({ replyId, lessonId }) => ({
+        url: `/comments/reply/${replyId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, { lessonId }) => [
+        { type: "Comments", id: lessonId },
+        "Comments",
+      ],
+    }),
+
+    // NOTIFICATIONS
+    getNotifications: builder.query({
+      query: () => ({
+        url: "/notifications",
+        method: "GET",
+      }),
+      providesTags: ["Notifications"],
+    }),
+    markNotificationAsRead: builder.mutation({
+      query: (id) => ({
+        url: `/notifications/${id}/read`,
+        method: "PUT",
+      }),
+      invalidatesTags: ["Notifications"],
+    }),
+    markAllNotificationsAsRead: builder.mutation({
+      query: () => ({
+        url: "/notifications/read-all",
+        method: "PUT",
+      }),
+      invalidatesTags: ["Notifications"],
+    }),
+    deleteNotification: builder.mutation({
+      query: (id) => ({
+        url: `/notifications/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Notifications"],
+    }),
   }),
 });
 
@@ -422,4 +509,13 @@ export const {
   useGetStudentOrdersAndSubscriptionsQuery,
   useDeleteStudentMutation,
   useGetDashboardQuery,
+  useGetLessonCommentsQuery,
+  useCreateCommentMutation,
+  useDeleteCommentMutation,
+  useCreateReplyMutation,
+  useDeleteReplyMutation,
+  useGetNotificationsQuery,
+  useMarkNotificationAsReadMutation,
+  useMarkAllNotificationsAsReadMutation,
+  useDeleteNotificationMutation,
 } = apiSlice;

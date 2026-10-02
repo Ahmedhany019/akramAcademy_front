@@ -7,6 +7,7 @@ import {
 } from "../../redux/api/apiSlice";
 import LessonVideo from "../../components/lessons/LessonVideo";
 import LessonPdf from "../../components/lessons/LessonPdf";
+import LessonComments from "../../components/lessons/LessonComments";
 import PageHeader from "../../components/common/PageHeader";
 import Skeleton from "../../components/common/Skeleton";
 import ErrorState from "../../components/common/ErrorState";
@@ -193,6 +194,9 @@ export default function LessonViewPage() {
             }
             isLoading={loadingPdf}
           />
+
+          {/* Lesson Comments & Discussions */}
+          <LessonComments lessonId={lessonId} />
         </>
       )}
 

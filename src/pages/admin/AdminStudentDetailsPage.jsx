@@ -166,19 +166,19 @@ export default function AdminStudentDetailsPage() {
           <div>
             <span className="text-[11px] text-textSecondary block">هاتف ولي الأمر</span>
             <span className="text-sm font-bold text-primary">
-              {student.parentPhone || "غير مسجل"}
+              {student.parent_phone || "غير مسجل"}
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-            <GraduationCap className="w-5 h-5" />
+            <Mail className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-[11px] text-textSecondary block">الصف الدراسي</span>
+            <span className="text-[11px] text-textSecondary block">البريد الالكتروني</span>
             <span className="text-sm font-bold text-primary">
-              {student.class?.name || "غير محدد"}
+              {student.email || "غير محدد"}
             </span>
           </div>
         </div>
