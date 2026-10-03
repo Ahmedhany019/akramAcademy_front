@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
 
-const storedUser = localStorage.getItem("user");
-const storedToken = localStorage.getItem("accessToken");
+const storedUser = Cookies.get("user");
+const storedToken = Cookies.get("accessToken");
 
 const initialState = {
   user: storedUser ? JSON.parse(storedUser) : null,
@@ -20,17 +21,17 @@ const authSlice = createSlice({
       if (user !== undefined) {
         state.user = user;
         if (user) {
-          localStorage.setItem("user", JSON.stringify(user));
+          Cookies.set("user", JSON.stringify(user));
         } else {
-          localStorage.removeItem("user");
+          Cookies.remove("user");
         }
       }
       if (accessToken !== undefined) {
         state.accessToken = accessToken;
         if (accessToken) {
-          localStorage.setItem("accessToken", accessToken);
+          Cookies.set("accessToken", accessToken);
         } else {
-          localStorage.removeItem("accessToken");
+          Cookies.remove("accessToken");
         }
       }
       state.isAuthenticated = !!state.accessToken;
@@ -39,8 +40,8 @@ const authSlice = createSlice({
       state.user = null;
       state.accessToken = null;
       state.isAuthenticated = false;
-      localStorage.removeItem("user");
-      localStorage.removeItem("accessToken");
+      Cookies.remove("user");
+      Cookies.remove("accessToken");
     },
   },
 });
