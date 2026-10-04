@@ -98,6 +98,17 @@ const filteredOrders = statusFilter
       ),
     },
     {
+      header: "الفصل",
+      accessor: "class",
+      render: (row) => (
+        <span
+          className="font-bold text-primary"
+        >
+          {row.class_name || "-"}
+        </span>
+      ),
+    },
+    {
       header: "خطة الاشتراك",
       accessor: "plan",
       render: (row) => row.plan?.name || row.planName || row.plan_name || "-",
